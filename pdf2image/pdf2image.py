@@ -2,7 +2,7 @@ from subprocess import Popen, PIPE
 from PIL import Image
 from io import BytesIO
 
-def convert_from_path(pdf_path, save_path=None, dpi=200):
+def convert_from_path(pdf_path, dpi=200):
     """
         Description: Convert PDF to Image
         Parameters:
@@ -27,7 +27,7 @@ def convert_from_path(pdf_path, save_path=None, dpi=200):
 
     return images
 
-def convert_from_bytes(pdf_file, save_path=None, dpi=200):
+def convert_from_bytes(pdf_file, dpi=200):
     """
         Description: Convert PDF to Image
         Parameters:
