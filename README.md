@@ -5,7 +5,7 @@ A python3 module that wraps the pdftoppm utility to convert PDF to the PIL image
 
 ` pip install pdf2image `
 
-Windows users will have to install (pdftoppm)[https://sourceforge.net/projects/poppler-win32/]
+Windows users will have to install [pdftoppm](https://sourceforge.net/projects/poppler-win32/)
 
 Linux users will have pdftoppm pre-installed with the distro (Tested on Ubuntu and Archlinux)
 
