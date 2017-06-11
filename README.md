@@ -1,4 +1,4 @@
-# pdf2image
+# pdf2image [![CircleCI](https://circleci.com/gh/Kankroc/pdf2image.svg?style=svg)](https://circleci.com/gh/Kankroc/pdf2image)
 A python3 module that wraps the pdftoppm utility to convert PDF to the PIL image formatt
 
 ## How to install

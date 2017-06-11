@@ -1,0 +1,13 @@
+general:
+  build_dir: tests
+machine:
+  post:
+    - pyenv global 3.5.1
+dependencies:
+  pre:
+    - sudo apt-get install poppler-utils
+  post:
+    - pip install pillow
+test:
+  override:
+    - python3 tests.py
