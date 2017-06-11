@@ -22,8 +22,10 @@ OR
 
 `images` will be a list of PIL Image representing each page of the PDF document.
 
+## Exception handling
+
+There are no exception thrown by pdftoppm therefore any file that couldn't be convert/processed will return an empty Image list. The philosophy behind this choice is simple, if the file was corrupted / not found, no image could be extracted and returning an empty list makes sense. (This is up for discussion)
+
 ## Limitations / known issues
 
 - A relatively big PDF will use up all your memory and cause the process to be killed
-- pdftoppm errors are not handled
-- Not Python 2 compatible

@@ -10,7 +10,7 @@ def convert_from_path(pdf_path, dpi=200):
             dpi -> Image quality in DPI (default 200)
     """
 
-    proc = Popen(['pdftoppm', '-r', str(dpi), pdf_path, ], stdout=PIPE)
+    proc = Popen(['pdftoppm', '-r', str(dpi), pdf_path, ], stdout=PIPE, stderr=PIPE)
 
     data, err = proc.communicate()
 
@@ -35,7 +35,7 @@ def convert_from_bytes(pdf_file, dpi=200):
             dpi -> Image quality in DPI
     """
 
-    proc = Popen(['pdftoppm', '-r', str(dpi), ], stdout=PIPE, stdin=PIPE)
+    proc = Popen(['pdftoppm', '-r', str(dpi), ], stdout=PIPE, stdin=PIPE, stderr=PIPE)
 
     proc.stdin.write(pdf_file)
 
