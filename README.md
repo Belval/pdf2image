@@ -14,11 +14,25 @@ Linux users will have pdftoppm pre-installed with the distro (Tested on Ubuntu a
 
 Then simply do:
 
-` images = convert_from_path('/home/kankroc/example.pdf') `
+``` py
+images = convert_from_path('/home/kankroc/example.pdf')
+```
 
 OR
 
-` images = convert_from_bytes(open('/home/kankroc/example.pdf', 'rb').read()) `
+``` py
+images = convert_from_bytes(open('/home/kankroc/example.pdf', 'rb').read())
+```
+
+OR better yet
+
+``` py
+import tempfile
+
+with tempfile.TemporaryDirectory() as path:
+     images_from_path = convert_from_path('/home/kankroc/example.pdf', output_folder=path)
+     # Do something here
+```
 
 `images` will be a list of PIL Image representing each page of the PDF document.
 
@@ -50,7 +64,7 @@ empty_if_file_not_found: 0.05123734474182129 sec @ 0 MB
 empty_if_not_pdf: 0.0519101619720459 sec @ 0 MB
 ```
 
-Bottom line: Use an output dir
+Bottom line: Use an output folder
 
 ## Exception handling
 
