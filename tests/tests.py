@@ -80,6 +80,7 @@ class PDFConversionMethods(unittest.TestCase):
         print('test_conversion_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
 
     @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_bytes_241(self):
         start_time = time.time()
         with open('./test_241.pdf', 'rb') as pdf_file:
@@ -88,6 +89,7 @@ class PDFConversionMethods(unittest.TestCase):
         print('test_conversion_from_bytes_241: {} sec'.format((time.time() - start_time) / 241.))
 
     @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_path_241(self):
         start_time = time.time()
         images_from_path = convert_from_path('./test_241.pdf')
@@ -95,6 +97,7 @@ class PDFConversionMethods(unittest.TestCase):
         print('test_conversion_from_path_241: {} sec'.format((time.time() - start_time) / 241.))
 
     @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_bytes_using_dir_241(self):
         start_time = time.time()
         with tempfile.TemporaryDirectory() as path:
@@ -105,6 +108,7 @@ class PDFConversionMethods(unittest.TestCase):
         print('test_conversion_from_bytes_using_dir_241: {} sec'.format((time.time() - start_time) / 241.))
 
     @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_path_using_dir_241(self):
         start_time = time.time()
         with tempfile.TemporaryDirectory() as path:
