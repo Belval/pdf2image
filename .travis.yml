@@ -1,0 +1,12 @@
+language: python
+python:
+  - "3.5"
+before_install:
+  - sudo apt-get install poppler-utils
+install:
+  - pip install pillow
+  - pip install psutil
+  - pip install memory_profiler
+script:
+  - cd tests/
+  - python3 tests.py

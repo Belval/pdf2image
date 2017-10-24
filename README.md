@@ -1,4 +1,4 @@
-# pdf2image [![CircleCI](https://circleci.com/gh/Belval/pdf2image.svg?style=svg)](https://circleci.com/gh/Belval/pdf2image) [![PyPI version](https://badge.fury.io/py/pdf2image.svg)](https://badge.fury.io/py/pdf2image)
+# pdf2image [![TravisCI](https://travis-ci.org/Belval/pdf2image.svg?branch=master)](https://travis-ci.org/Belval/pdf2image) [![PyPI version](https://badge.fury.io/py/pdf2image.svg)](https://badge.fury.io/py/pdf2image)
 A python3 module that wraps the pdftoppm utility to convert PDF to the PIL image formatt
 
 ## How to install
