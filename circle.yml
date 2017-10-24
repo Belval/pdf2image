@@ -8,6 +8,8 @@ dependencies:
     - sudo apt-get install poppler-utils
   post:
     - pip install pillow
+    - pip install psutil
+    - pip install memory_profiler
 test:
   override:
     - python3 tests.py
