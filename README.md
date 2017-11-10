@@ -5,6 +5,8 @@ A python3 module that wraps the pdftoppm utility to convert PDF to a PIL Image o
 
 ` pip3 install pdf2image `
 
+Install `Pillow` if you don't have it already with `pip3 install pillow`
+
 ###
 
 pdftoppm is the piece of software that does the actual magic. It is distributed as part of a greater package called [poppler](https://poppler.freedesktop.org/).
