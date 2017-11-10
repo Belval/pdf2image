@@ -63,7 +63,7 @@ def __parse_pdftoppm_buffer(data):
     index = 0
 
     while(index < len(data)):
-        code, size, rgb, _ = tuple(data[index:index + 40].split(b'\n'))
+        code, size, rgb = tuple(data[index:index + 40].split(b'\n')[0:3])
         size_x, size_y = tuple(size.split(b' '))
         file_size = len(code) + len(size) + len(rgb) + 3 + int(size_x) * int(size_y) * 3
         images.append(Image.open(BytesIO(data[index:index + file_size])))
