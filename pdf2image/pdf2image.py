@@ -72,4 +72,4 @@ def __parse_pdftoppm_buffer(data):
     return images
 
 def __load_from_output_folder(output_folder):
-    return [Image.open(os.path.join(output_folder, f)) for f in os.listdir(output_folder)]
+    return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder))]
