@@ -42,4 +42,7 @@ setup(
     keywords='pdf image png jpeg jpg convert',
 
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    install_requires=[
+        'pillow',
+    ]
 )
