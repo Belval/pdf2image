@@ -7,6 +7,8 @@ install:
   - pip install pillow
   - pip install psutil
   - pip install memory_profiler
+  - pip install codecov
 script:
-  - cd tests/
   - python3 tests.py
+  - coverage run tests.py
+  - codecov
