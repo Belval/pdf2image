@@ -44,6 +44,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None):
     if output_folder is not None:
         with tempfile.NamedTemporaryFile('wb') as f:
             f.write(pdf_file)
+            f.flush()
             return convert_from_path(f.name, dpi=dpi, output_folder=output_folder)
 
     proc = Popen(args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
