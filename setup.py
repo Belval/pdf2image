@@ -9,7 +9,7 @@ here = path.abspath(path.dirname(__file__))
 setup(
     name='pdf2image',
 
-    version='0.1.6',
+    version='0.1.7',
 
     description='A wrapper around the pdftoppm command line tool to convert pdf to a PIL Image list.',
 
