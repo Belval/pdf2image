@@ -133,7 +133,81 @@ class PDFConversionMethods(unittest.TestCase):
     def test_empty_if_corrupted_pdf(self):
         start_time = time.time()
         self.assertTrue(len(convert_from_path('./tests/test_corrupted.pdf')) == 0)
-        print('test_empty_if_corrupted: {} sec'.format(time.time() - start_time))
+        print('test_empty_if_corrupted_pdf: {} sec'.format(time.time() - start_time))
+
+    # Test max page count
+
+    @profile
+    def test_conversion_from_bytes_14_max_page_count_12(self):
+        start_time = time.time()
+        with open('./tests/test_14.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), max_page_count=12)
+            self.assertTrue(len(images_from_bytes) == 12)
+        print('test_conversion_from_bytes_14_max_page_count_12: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_path_14_max_page_count_12(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test_14.pdf', max_page_count=12)
+        self.assertTrue(len(images_from_path) == 12)
+        print('test_conversion_from_path_14_max_page_count_12: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_bytes_using_dir_14_max_page_count_12(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test_14.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, max_page_count=12)
+                self.assertTrue(len(images_from_bytes) == 12)
+                [im.close() for im in images_from_bytes]
+        print('test_conversion_from_bytes_using_dir_14_max_page_count_12: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_path_using_dir_14_max_page_count_12(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, max_page_count=12)
+            self.assertTrue(len(images_from_path) == 12)
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_14_max_page_count_12: {} sec'.format((time.time() - start_time) / 14.))
+
+    ## Test output as jpeg
+
+    @profile
+    def test_conversion_to_jpeg_from_bytes(self):
+        start_time = time.time()
+        with open('./tests/test.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt='jpg')
+            self.assertTrue(images_from_bytes[0].format == 'JPEG')
+        print('test_conversion_to_jpeg_from_bytes_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_to_jpeg_from_path_using_dir(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, fmt='jpeg')
+            self.assertTrue(images_from_path[0].format == 'JPEG')
+            [im.close() for im in images_from_path]
+        print('test_conversion_to_jpeg_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    ## Test output as png
+
+    @profile
+    def test_conversion_to_png_from_bytes(self):
+        start_time = time.time()
+        with open('./tests/test.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt='png')
+            self.assertTrue(images_from_bytes[0].format == 'PNG')
+        print('test_conversion_to_png_from_bytes_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_to_png_from_path_using_dir(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, fmt='png')
+            self.assertTrue(images_from_path[0].format == 'PNG')
+            [im.close() for im in images_from_path]
+        print('test_conversion_to_png_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
 
 if __name__=='__main__':
     unittest.main()
