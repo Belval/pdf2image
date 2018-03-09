@@ -44,6 +44,18 @@ with tempfile.TemporaryDirectory() as path:
 
 `images` will be a list of PIL Image representing each page of the PDF document.
 
+Here are the definitions:
+
+`convert_from_path(pdf_path, dpi=200, output_folder=None, max_page_count=None, fmt='ppm')`
+
+`convert_from_bytes(pdf_file, dpi=200, output_folder=None, max_page_count=None, fmt='ppm')`
+
+
+## What's new?
+
+- `max_page_count` parameter allows you to limit how many pages will be processed by pdftoppm (`-l` in the cli)
+- `fmt` parameter allows you to specify an output format. Currently supported formats are `jpg`, `png`, and `ppm`
+
 ## Timing
 
 You can reproduce those results by running the provided tests. The process' peak memory usage was added to help the comparison and was gathered using the `memory_profiler` module.
@@ -54,23 +66,32 @@ All tests were ran with the default 200 dpi resolution.
 
 My computer has an SSD. Run `python3 tests.py` for the timing on your machine.
 
-```
-conversion_from_bytes: 0.03930950164794922 sec @ 23 MB
-conversion_from_bytes_14: 0.05591930661882673 sec @ 289.4 MB
-conversion_from_bytes_241: 0.026828476007548605 sec @ 4991.1 MB
-conversion_from_bytes_using_dir: 0.06357479095458984 sec @ 0 MB
-conversion_from_bytes_using_dir_14: 0.052671926362173896 sec @ 0 MB
-conversion_from_bytes_using_dir_241: 0.021176524182078254 sec @ 0.1 MB
-conversion_from_path: 0.0684502124786377 sec @ 0 MB
-conversion_from_path_14: 0.0592965909412929 sec @ 0 MB
-conversion_from_path_241: 0.02652374441692938 sec @ 2568 MB
-conversion_from_path_using_dir: 0.061820268630981445 sec @ 0 MB
-conversion_from_path_using_dir_14: 0.052453075136457174 sec @ 0 MB
-conversion_from_path_using_dir_241: 0.021224186133546947 sec @ 0 MB
-empty_if_corrupted: 0.052927494049072266 sec @ 0 MB
-empty_if_file_not_found: 0.05123734474182129 sec @ 0 MB
-empty_if_not_pdf: 0.0519101619720459 sec @ 0 MB
-```
+| Test name | sec/page | Peak memory usage |
+| --- | --- | --- |
+| test_conversion_from_bytes | 0.1403517723083496 sec | 23.4 MiB |
+| test_conversion_from_bytes_14 | 0.08628017561776298 sec | 289.6 MiB |
+| test_conversion_from_bytes_14_max_page_count_12 | 0.07760441303253174 sec | 85.5 MiB |
+| test_conversion_from_bytes_241 | 0.05936517952883392 sec | 5033.9 MiB |
+| test_conversion_from_bytes_using_dir | 0.06892609596252441 sec | 0.0 MiB |
+| test_conversion_from_bytes_using_dir_14 | 0.05760715688977923 sec | 0.0 MiB |
+| test_conversion_from_bytes_using_dir_14_max_page_count_12 | 0.05288205827985491 sec | 0.0 MiB |
+| test_conversion_from_bytes_using_dir_241 | 0.02622196882097553 sec | 0.1 MiB |
+| test_conversion_from_path | 0.08991026878356934 sec | 0.0 MiB |
+| test_conversion_from_path_14 | 0.09094854763575963 sec | 0.0 MiB |
+| test_conversion_from_path_14_max_page_count_12 | 0.07591407639639718 sec | 0.0 MiB |
+| test_conversion_from_path_241 | 0.05391744953962777 sec | 2568.0 MiB |
+| test_conversion_from_path_using_dir | 0.06876587867736816 sec | 0.0 MiB |
+| test_conversion_from_path_using_dir_14 | 0.057496104921613424 sec | 0.0 MiB |
+| test_conversion_from_path_using_dir_14_max_page_count_12 | 0.05267822742462158 sec | 0.0 MiB |
+| test_conversion_from_path_using_dir_241 | 0.026008206284392425 sec | 0.0 MiB |
+| test_conversion_to_jpeg_from_bytes_14 | 0.0049211808613368446 sec | 0.0 MiB |
+| test_conversion_to_jpeg_from_path_using_dir_14 | 0.005251186234610421 sec | 0.0 MiB |
+| test_conversion_to_png_from_bytes_14 | 0.014363850866045271 sec | 0.1 MiB |
+| test_conversion_to_png_from_path_using_dir_14 | 0.014109304973057337 sec | 0.0 MiB |
+| test_empty_if_corrupted_pdf | 0.04371809959411621 sec | 0.0 MiB |
+| test_empty_if_file_not_found | 0.04585576057434082 sec | 0.0 MiB |
+| test_empty_if_not_pdf | 0.048310041427612305 sec | 0.0 MiB |
+
 
 Bottom line: Use an output folder
 
