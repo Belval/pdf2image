@@ -135,21 +135,21 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(len(convert_from_path('./tests/test_corrupted.pdf')) == 0)
         print('test_empty_if_corrupted_pdf: {} sec'.format(time.time() - start_time))
 
-    # Test first page
+    ## Test first page
 
     @profile
     def test_conversion_from_bytes_14_first_page_12(self):
         start_time = time.time()
         with open('./tests/test_14.pdf', 'rb') as pdf_file:
             images_from_bytes = convert_from_bytes(pdf_file.read(), first_page=12)
-            self.assertTrue(len(images_from_bytes) == 12)
+            self.assertTrue(len(images_from_bytes) == 3)
         print('test_conversion_from_bytes_14_last_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
     @profile
     def test_conversion_from_path_14_first_page_12(self):
         start_time = time.time()
         images_from_path = convert_from_path('./tests/test_14.pdf', first_page=12)
-        self.assertTrue(len(images_from_path) == 12)
+        self.assertTrue(len(images_from_path) == 3)
         print('test_conversion_from_path_14_first_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
     @profile
@@ -158,7 +158,7 @@ class PDFConversionMethods(unittest.TestCase):
         with tempfile.TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, first_page=12)
-                self.assertTrue(len(images_from_bytes) == 12)
+                self.assertTrue(len(images_from_bytes) == 3)
                 [im.close() for im in images_from_bytes]
         print('test_conversion_from_bytes_using_dir_14_first_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
@@ -167,11 +167,11 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with tempfile.TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, first_page=12)
-            self.assertTrue(len(images_from_path) == 12)
+            self.assertTrue(len(images_from_path) == 3)
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_14_first_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
-    # Test last page
+    ## Test last page
 
     @profile
     def test_conversion_from_bytes_14_last_page_12(self):
@@ -207,21 +207,21 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_14_last_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
-    # Test first and last page
+    ## Test first and last page
 
     @profile
     def test_conversion_from_bytes_14_first_page_2_last_page_12(self):
         start_time = time.time()
         with open('./tests/test_14.pdf', 'rb') as pdf_file:
             images_from_bytes = convert_from_bytes(pdf_file.read(), first_page=2, last_page=12)
-            self.assertTrue(len(images_from_bytes) == 10)
+            self.assertTrue(len(images_from_bytes) == 11)
         print('test_conversion_from_bytes_14_first_page_2_last_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
     @profile
     def test_conversion_from_path_14_first_page_2_last_page_12(self):
         start_time = time.time()
         images_from_path = convert_from_path('./tests/test_14.pdf', first_page=2, last_page=12)
-        self.assertTrue(len(images_from_path) == 10)
+        self.assertTrue(len(images_from_path) == 11)
         print('test_conversion_from_path_14_first_page_2_last_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
     @profile
@@ -230,7 +230,7 @@ class PDFConversionMethods(unittest.TestCase):
         with tempfile.TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, first_page=2, last_page=12)
-                self.assertTrue(len(images_from_bytes) == 10)
+                self.assertTrue(len(images_from_bytes) == 11)
                 [im.close() for im in images_from_bytes]
         print('test_conversion_from_bytes_using_dir_14_first_page_2_last_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
@@ -239,7 +239,7 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with tempfile.TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, first_page=2, last_page=12)
-            self.assertTrue(len(images_from_path) == 10)
+            self.assertTrue(len(images_from_path) == 11)
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_14_first_page_2_last_page_12: {} sec'.format((time.time() - start_time) / 14.))
 
