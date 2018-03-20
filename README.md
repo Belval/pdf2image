@@ -46,14 +46,14 @@ with tempfile.TemporaryDirectory() as path:
 
 Here are the definitions:
 
-`convert_from_path(pdf_path, dpi=200, output_folder=None, max_page_count=None, fmt='ppm')`
+`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm')`
 
-`convert_from_bytes(pdf_file, dpi=200, output_folder=None, max_page_count=None, fmt='ppm')`
+`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm')`
 
 
 ## What's new?
-
-- `max_page_count` parameter allows you to limit how many pages will be processed by pdftoppm (`-l` in the cli)
+- `first_page` paramater allows you to set a first page to be processed by pdftoppm (`-f` in the cli of pdftoppm)
+- `last_page` paramater allows you to set a last page to be processed by pdftoppm (`-l` in the cli of pdftoppm)
 - `fmt` parameter allows you to specify an output format. Currently supported formats are `jpg`, `png`, and `ppm`
 
 ## Timing
@@ -68,29 +68,37 @@ My computer has an SSD. Run `python3 tests.py` for the timing on your machine.
 
 | Test name | sec/page | Peak memory usage |
 | --- | --- | --- |
-| test_conversion_from_bytes | 0.1403517723083496 sec | 23.4 MiB |
-| test_conversion_from_bytes_14 | 0.08628017561776298 sec | 289.6 MiB |
-| test_conversion_from_bytes_14_max_page_count_12 | 0.07760441303253174 sec | 85.5 MiB |
-| test_conversion_from_bytes_241 | 0.05936517952883392 sec | 5033.9 MiB |
-| test_conversion_from_bytes_using_dir | 0.06892609596252441 sec | 0.0 MiB |
-| test_conversion_from_bytes_using_dir_14 | 0.05760715688977923 sec | 0.0 MiB |
-| test_conversion_from_bytes_using_dir_14_max_page_count_12 | 0.05288205827985491 sec | 0.0 MiB |
-| test_conversion_from_bytes_using_dir_241 | 0.02622196882097553 sec | 0.1 MiB |
-| test_conversion_from_path | 0.08991026878356934 sec | 0.0 MiB |
-| test_conversion_from_path_14 | 0.09094854763575963 sec | 0.0 MiB |
-| test_conversion_from_path_14_max_page_count_12 | 0.07591407639639718 sec | 0.0 MiB |
-| test_conversion_from_path_241 | 0.05391744953962777 sec | 2568.0 MiB |
-| test_conversion_from_path_using_dir | 0.06876587867736816 sec | 0.0 MiB |
-| test_conversion_from_path_using_dir_14 | 0.057496104921613424 sec | 0.0 MiB |
-| test_conversion_from_path_using_dir_14_max_page_count_12 | 0.05267822742462158 sec | 0.0 MiB |
-| test_conversion_from_path_using_dir_241 | 0.026008206284392425 sec | 0.0 MiB |
-| test_conversion_to_jpeg_from_bytes_14 | 0.0049211808613368446 sec | 0.0 MiB |
-| test_conversion_to_jpeg_from_path_using_dir_14 | 0.005251186234610421 sec | 0.0 MiB |
-| test_conversion_to_png_from_bytes_14 | 0.014363850866045271 sec | 0.1 MiB |
-| test_conversion_to_png_from_path_using_dir_14 | 0.014109304973057337 sec | 0.0 MiB |
-| test_empty_if_corrupted_pdf | 0.04371809959411621 sec | 0.0 MiB |
-| test_empty_if_file_not_found | 0.04585576057434082 sec | 0.0 MiB |
-| test_empty_if_not_pdf | 0.048310041427612305 sec | 0.0 MiB |
+| test_conversion_from_bytes | 0.08025979995727539 sec | 69.7 MiB
+| test_conversion_from_bytes_14 | 0.07791144507271903 sec | 348.1 MiB
+| test_conversion_from_bytes_14_last_page_12 | 0.015511631965637207 sec | 219.9 MiB
+| test_conversion_from_bytes_14_first_page_2_last_page_12 | 0.053603836468287876 sec | 283.9 MiB
+| test_conversion_from_bytes_14_last_page_12 | 0.05721770014081683 sec | 305.3 MiB
+| test_conversion_from_bytes_241 | 0.040824553778557364 sec | 5210.9 MiB
+| test_conversion_from_bytes_using_dir | 0.13207364082336426 sec | 2643.0 MiB
+| test_conversion_from_bytes_using_dir_14 | 0.05664423533848354 sec | 2643.0 MiB
+| test_conversion_from_bytes_using_dir_14_first_page_12 | 0.0180361270904541 sec | 2643.0 MiB
+| test_conversion_from_bytes_using_dir_14_first_page_2_last_page_12 | 0.07084715366363525 sec | 2643.0 MiB
+| test_conversion_from_bytes_using_dir_14_last_page_12 | 0.06571905953543526 sec | 2643.0 MiB
+| test_conversion_from_bytes_using_dir_241 | 0.03664693001394945 sec | 177.4 MiB
+| test_conversion_from_path | 0.041847944259643555 sec | 177.4 MiB
+| test_conversion_from_path_14 | 0.06815803050994873 sec | 347.7 MiB
+| test_conversion_from_path_14_first_page_12 | 0.013361079352242606 sec | 177.4 MiB
+| test_conversion_from_path_14_first_page_2_last_page_12 | 0.06226999419076102 sec | 284.3 MiB
+| test_conversion_from_path_14_last_page_12 | 0.06276893615722656 sec | 305.7 MiB
+| test_conversion_from_path_241 | 0.04187167630650691 sec | 5210.2 MiB
+| test_conversion_from_path_using_dir | 0.1171102523803711 sec | 2642.3 MiB
+| test_conversion_from_path_using_dir_14 | 0.05710525172097342 sec | 2642.3 MiB
+| test_conversion_from_path_using_dir_14_first_page_12 | 0.0152871949332101 sec | 2642.3 MiB
+| test_conversion_from_path_using_dir_14_first_page_2_last_page_12 | 0.04539140633174351 sec | 2642.3 MiB
+| test_conversion_from_path_using_dir_14_last_page_12 | 0.05119928291865757 sec | 2642.3 MiB
+| test_conversion_from_path_using_dir_241 | 0.03425470724145407 sec | 177.4 MiB
+| test_conversion_to_jpeg_from_bytes_14 | 0.0022412879126412527 sec | 177.4 MiB
+| test_conversion_to_jpeg_from_path_using_dir_14 | 0.002368075507027762 sec | 177.4 MiB
+| test_conversion_to_png_from_bytes_14 | 0.010121209280831473 sec | 177.4 MiB
+| test_conversion_to_png_from_path_using_dir_14 | 0.010833195277622767 sec | 177.4 MiB
+| test_empty_if_corrupted_pdf | 0.008587360382080078 sec | 177.4 MiB
+| test_empty_if_file_not_found | 0.008152961730957031 sec | 177.4 MiB
+| test_empty_if_not_pdf | 0.01006937026977539 sec | 177.4 MiB
 
 
 Bottom line: Use an output folder
