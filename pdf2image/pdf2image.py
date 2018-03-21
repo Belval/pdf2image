@@ -117,4 +117,4 @@ def __parse_buffer_to_png(data):
     return images
 
 def __load_from_output_folder(output_folder):
-    return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder))]
+    return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if f[0] != '.']

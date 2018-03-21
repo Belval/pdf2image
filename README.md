@@ -52,8 +52,8 @@ Here are the definitions:
 
 
 ## What's new?
-- `first_page` paramater allows you to set a first page to be processed by pdftoppm (`-f` in the cli of pdftoppm)
-- `last_page` paramater allows you to set a last page to be processed by pdftoppm (`-l` in the cli of pdftoppm)
+- `first_page` parameter allows you to set a first page to be processed by pdftoppm (`-f` in the cli of pdftoppm)
+- `last_page` parameter allows you to set a last page to be processed by pdftoppm (`-l` in the cli of pdftoppm)
 - `fmt` parameter allows you to specify an output format. Currently supported formats are `jpg`, `png`, and `ppm`
 
 ## Timing
