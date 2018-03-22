@@ -290,5 +290,16 @@ class PDFConversionMethods(unittest.TestCase):
         [os.remove(im.filename) for im in images_from_path]
         print('test_non_empty_output_folder: {} sec'.format((time.time() - start_time) / 14.))
 
+    ## Test format that starts with a dot
+
+    def test_format_that_starts_with_a_dot(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg')
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_format_that_starts_with_a_dot: {} sec'.format(time.time() - start_time))
+
 if __name__=='__main__':
     unittest.main()
