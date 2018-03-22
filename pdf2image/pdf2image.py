@@ -1,6 +1,7 @@
 import os
 import sys
 import tempfile
+import uuid
 
 from subprocess import Popen, PIPE
 from PIL import Image
@@ -18,14 +19,14 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             fmt -> Output image format
     """
 
-    args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, first_page, last_page, fmt)
+    uid, args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, first_page, last_page, fmt)
 
     proc = Popen(args, stdout=PIPE, stderr=PIPE)
 
     data, err = proc.communicate()
 
     if output_folder is not None:
-        return __load_from_output_folder(output_folder)
+        return __load_from_output_folder(output_folder, uid)
     else:
         return parse_buffer_func(data)
 
@@ -47,7 +48,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             f.flush()
             return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt)
 
-    args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi)], output_folder, first_page, last_page, fmt)
+    _, args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi)], output_folder, first_page, last_page, fmt)
 
     proc = Popen(args, stdout=PIPE, stdin=PIPE, stderr=PIPE)
 
@@ -58,6 +59,10 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
     return parse_buffer_func(data)
 
 def __build_command(args, output_folder, first_page, last_page, fmt):
+
+    # A unique identifier for our files if the directory in case the directory is not empty
+    uid = str(uuid.uuid4())
+
     if first_page is not None:
         args.extend(['-f', str(first_page)])
 
@@ -70,9 +75,9 @@ def __build_command(args, output_folder, first_page, last_page, fmt):
         args.append('-' + parsed_format)
 
     if output_folder is not None:
-        args.append(output_folder if output_folder[-1] == '/' else output_folder + '/')
+        args.append(output_folder + uid if output_folder[-1] == '/' else output_folder + '/' + uid)
 
-    return args, parse_buffer_func
+    return uid, args, parse_buffer_func
 
 def __parse_format(fmt):
     if fmt[0] == '.':
@@ -116,5 +121,5 @@ def __parse_buffer_to_png(data):
 
     return images
 
-def __load_from_output_folder(output_folder):
-    return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if f[0] != '.']
+def __load_from_output_folder(output_folder, uid):
+    return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if uid in f]

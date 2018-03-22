@@ -281,5 +281,14 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_to_png_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
 
+    ## Test output with not-empty output_folder
+
+    def test_non_empty_output_folder(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test.pdf', output_folder='./tests/')
+        self.assertTrue(len(images_from_path) == 1)
+        [os.remove(im.filename) for im in images_from_path]
+        print('test_non_empty_output_folder: {} sec'.format((time.time() - start_time) / 14.))
+
 if __name__=='__main__':
     unittest.main()
