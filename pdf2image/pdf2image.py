@@ -60,7 +60,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
 
 def __build_command(args, output_folder, first_page, last_page, fmt):
 
-    # A unique identifier for our files if the directory in case the directory is not empty
+    # A unique identifier for our files if the directory is not empty
     uid = str(uuid.uuid4())
 
     if first_page is not None:
@@ -75,7 +75,7 @@ def __build_command(args, output_folder, first_page, last_page, fmt):
         args.append('-' + parsed_format)
 
     if output_folder is not None:
-        args.append(output_folder + uid if output_folder[-1] == '/' else output_folder + '/' + uid)
+        args.append(os.path.join(output_folder, uid))
 
     return uid, args, parse_buffer_func
 
