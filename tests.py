@@ -120,19 +120,22 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_empty_if_not_pdf(self):
         start_time = time.time()
-        self.assertTrue(len(convert_from_path('./tests/test.jpg')) == 0)
+        with self.assertRaises(Exception):
+            convert_from_path('./tests/test.jpg')
         print('test_empty_if_not_pdf: {} sec'.format(time.time() - start_time))
 
     @profile
     def test_empty_if_file_not_found(self):
         start_time = time.time()
-        self.assertTrue(len(convert_from_path('./tests/totally_a_real_file_in_folder.xyz')) == 0)
+        with self.assertRaises(Exception):
+            convert_from_path('./tests/totally_a_real_file_in_folder.xyz')
         print('test_empty_if_file_not_found: {} sec'.format(time.time() - start_time))
 
     @profile
     def test_empty_if_corrupted_pdf(self):
         start_time = time.time()
-        self.assertTrue(len(convert_from_path('./tests/test_corrupted.pdf')) == 0)
+        with self.assertRaises(Exception):
+            convert_from_path('./tests/test_corrupted.pdf')
         print('test_empty_if_corrupted_pdf: {} sec'.format(time.time() - start_time))
 
     ## Test first page
@@ -300,6 +303,80 @@ class PDFConversionMethods(unittest.TestCase):
                 self.assertTrue(len(images_from_bytes) == 1)
                 [im.close() for im in images_from_bytes]
         print('test_format_that_starts_with_a_dot: {} sec'.format(time.time() - start_time))
+
+    ## Test multithreading
+
+    @profile
+    def test_conversion_from_bytes_14_with_4_threads(self):
+        start_time = time.time()
+        with open('./tests/test_14.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), thread_count=4)
+            self.assertTrue(len(images_from_bytes) == 14)
+        print('test_conversion_from_bytes_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_path_14_with_4_threads(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test_14.pdf', thread_count=4)
+        self.assertTrue(len(images_from_path) == 14)
+        print('test_conversion_from_path_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_bytes_using_dir_14_with_4_threads(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test_14.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, thread_count=4)
+                self.assertTrue(len(images_from_bytes) == 14)
+                [im.close() for im in images_from_bytes]
+        print('test_conversion_from_bytes_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_path_using_dir_14_with_4_threads(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, thread_count=4)
+            self.assertTrue(len(images_from_path) == 14)
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
+    def test_conversion_from_bytes_241_with_4_threads(self): # pragma: no cover
+        start_time = time.time()
+        with open('./tests/test_241.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), thread_count=4)
+            self.assertTrue(len(images_from_bytes) == 241)
+        print('test_conversion_from_bytes_241: {} sec'.format((time.time() - start_time) / 241.))
+
+    @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
+    def test_conversion_from_path_241_with_4_threads(self): # pragma: no cover
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test_241.pdf', thread_count=4)
+        self.assertTrue(len(images_from_path) == 241)
+        print('test_conversion_from_path_241: {} sec'.format((time.time() - start_time) / 241.))
+
+    @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
+    def test_conversion_from_bytes_using_dir_241_with_4_threads(self): # pragma: no cover
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test_241.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, thread_count=4)
+                self.assertTrue(len(images_from_bytes) == 241)
+                [im.close() for im in images_from_bytes]
+        print('test_conversion_from_bytes_using_dir_241: {} sec'.format((time.time() - start_time) / 241.))
+
+    @profile
+    @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
+    def test_conversion_from_path_using_dir_241_with_4_threads(self): # pragma: no cover
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test_241.pdf', output_folder=path, thread_count=4)
+            self.assertTrue(len(images_from_path) == 241)
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_241: {} sec'.format((time.time() - start_time) / 241.))
 
 if __name__=='__main__':
     unittest.main()
