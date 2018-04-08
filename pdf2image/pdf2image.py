@@ -31,37 +31,35 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         thread_count = 1
 
     if first_page is None:
-        first_page = 0
+        first_page = 1
 
     if last_page is None or last_page > page_count:
         last_page = page_count
 
     # Recalculate page count based on first and last page
-    page_count = last_page - first_page
+    page_count = last_page - first_page + 1
 
     if thread_count > page_count:
         thread_count = page_count
-
-    # A unique identifier for our files if the directory is not empty
-    uid = str(uuid.uuid4())
 
     reminder = page_count % thread_count
     current_page = first_page
     processes = []
     for _ in range(thread_count):
+        # A unique identifier for our files if the directory is not empty
+        uid = str(uuid.uuid4())
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count, fmt, uid)
+        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid)
         # Update page values
-        current_page += thread_page_count
+        current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
-        # Spawn the process
-        processes.append(Popen(args, stdout=PIPE, stderr=PIPE))
+        # Spawn the process and save its uuid
+        processes.append((uid, Popen(args, stdout=PIPE, stderr=PIPE)))
 
     images = []
-    for proc in processes:
-        print('Blah')
+    for uid, proc in processes:
         data, _ = proc.communicate()
 
         if output_folder is not None:
@@ -111,10 +109,10 @@ def __parse_format(fmt):
         fmt = fmt[1:]
     if fmt == 'jpeg' or fmt == 'jpg':
         return 'jpeg', __parse_buffer_to_jpeg
-    elif fmt == 'png':
+    if fmt == 'png':
         return 'png', __parse_buffer_to_png
-    else:
-        return 'ppm', __parse_buffer_to_ppm
+    # Unable to parse the format so we'll use the default
+    return 'ppm', __parse_buffer_to_ppm
 
 def __parse_buffer_to_ppm(data):
     images = []
