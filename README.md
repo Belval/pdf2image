@@ -51,6 +51,7 @@ Here are the definitions:
 `convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm')`
 
 ## What's new?
+- `userpw` parameter allows you to set a password to unlock the converted PDF (`-upw` in the cli of pdftoppm)
 - `thread_count` parameter allows you to set how many thread will be used for conversion.
 - `first_page` parameter allows you to set a first page to be processed by pdftoppm (`-f` in the cli of pdftoppm)
 - `last_page` parameter allows you to set a last page to be processed by pdftoppm (`-l` in the cli of pdftoppm)

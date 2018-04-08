@@ -12,7 +12,7 @@ from io import BytesIO
 from subprocess import Popen, PIPE
 from PIL import Image
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1):
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -23,9 +23,10 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             last_page -> Last page to process before stopping
             fmt -> Output image format
             thread_count -> How many threads we are allowed to spawn for processing
+            userpw -> PDF's password
     """
 
-    page_count = __page_count(pdf_path)
+    page_count = __page_count(pdf_path, userpw)
 
     if thread_count < 1:
         thread_count = 1
@@ -51,7 +52,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid)
+        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw)
         # Update page values
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
@@ -69,7 +70,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -80,14 +81,15 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             last_page -> Last page to process before stopping
             fmt -> Output image format
             thread_count -> How many threads we are allowed to spawn for processing
+            userpw -> PDF's password
     """
 
     with tempfile.NamedTemporaryFile('wb') as f:
         f.write(pdf_file)
         f.flush()
-        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count)
+        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw)
 
-def __build_command(args, output_folder, first_page, last_page, fmt, uid):
+def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw):
     if first_page is not None:
         args.extend(['-f', str(first_page)])
 
@@ -101,6 +103,9 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid):
 
     if output_folder is not None:
         args.append(os.path.join(output_folder, uid))
+
+    if userpw is not None:
+        args.extend(['-upw', userpw])
 
     return args, parse_buffer_func
 
@@ -146,8 +151,12 @@ def __parse_buffer_to_png(data):
 
     return images
 
-def __page_count(pdf_path):
-    proc = Popen(["pdfinfo", pdf_path], stdout=PIPE, stderr=PIPE)
+def __page_count(pdf_path, userpw=None):
+    if userpw is not None:
+        proc = Popen(["pdfinfo", pdf_path, '-upw', userpw], stdout=PIPE, stderr=PIPE)
+    else:
+        proc = Popen(["pdfinfo", pdf_path], stdout=PIPE, stderr=PIPE)
+
     out, _ = proc.communicate()
     try:
         # This will throw if we are unable to get page count
