@@ -11,9 +11,9 @@ Install `Pillow` if you don't have it already with `pip3 install pillow`
 
 pdftoppm is the piece of software that does the actual magic. It is distributed as part of a greater package called [poppler](https://poppler.freedesktop.org/).
 
-Windows users will have to install [poppler for Windows](https://sourceforge.net/projects/poppler-win32/)
+Windows users will have to install [poppler for Windows](http://blog.alivate.com.au/poppler-windows/).
 
-Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/)
+Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/).
 
 Linux users will have pdftoppm pre-installed with the distro (Tested on Ubuntu and Archlinux) if it's not, run `sudo apt install poppler-utils`
 
