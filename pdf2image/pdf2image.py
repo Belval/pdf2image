@@ -151,7 +151,7 @@ def __page_count(pdf_path):
     out, _ = proc.communicate()
     try:
         # This will throw if we are unable to get page count
-        return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8")).group(1))
+        return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
     except:
         raise Exception('Unable to get page count.')
 
