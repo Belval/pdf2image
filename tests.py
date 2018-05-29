@@ -325,6 +325,49 @@ class PDFConversionMethods(unittest.TestCase):
                 [im.close() for im in images_from_bytes]
         print('test_format_that_starts_with_a_dot: {} sec'.format(time.time() - start_time))
 
+    ## Test locked PDF
+
+    @profile
+    def test_locked_pdf_with_userpw_only(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test_locked_user_only.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg', userpw='pdf2image')
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_locked_pdf_with_userpw_only: {} sec'.format(time.time() - start_time))
+
+    @profile
+    def test_not_locked_pdf(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg', userpw='pdf2image')
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_locked_pdf_with_userpw_only: {} sec'.format(time.time() - start_time))
+
+    @profile
+    def test_locked_pdf_with_ownerpw_only(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test_locked_owner_only.pdf', 'rb') as pdf_file:
+                # No need to pass a ownerpw because the absence of userpw means we can read it anyway
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg')
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_locked_pdf_with_ownerpw_only: {} sec'.format(time.time() - start_time))
+
+    @profile
+    def test_locked_pdf_with_ownerpw_and_userpw(self):
+        start_time = time.time()
+        with tempfile.TemporaryDirectory() as path:
+            with open('./tests/test_locked_both.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg', userpw='pdf2image')
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_locked_pdf_with_ownerpw_and_userpw: {} sec'.format(time.time() - start_time))
+
     ## Test multithreading
 
     @profile
