@@ -4,6 +4,22 @@ import tempfile
 import unittest
 import time
 
+# polyfill for python27
+try:
+    from tempfile import TemporaryDirectory
+except ImportError:
+    import shutil
+
+    class TemporaryDirectory(object):
+        def __init__(self):
+            self.name = tempfile.mkdtemp()
+
+        def __enter__(self):
+            return self.name
+
+        def __exit__(self, exc, value, tb):
+            shutil.rmtree(self.name)
+
 from memory_profiler import profile as profile_memory
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -48,7 +64,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_bytes_using_dir(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path)
                 self.assertTrue(len(images_from_bytes) == 1)
@@ -58,7 +74,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_path_using_dir(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test.pdf', output_folder=path)
             self.assertTrue(len(images_from_path) == 1)
             [im.close() for im in images_from_path]
@@ -82,7 +98,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_bytes_using_dir_14(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path)
                 self.assertTrue(len(images_from_bytes) == 14)
@@ -92,7 +108,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_path_using_dir_14(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path)
             self.assertTrue(len(images_from_path) == 14)
             [im.close() for im in images_from_path]
@@ -119,7 +135,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_bytes_using_dir_241(self): # pragma: no cover
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_241.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path)
                 self.assertTrue(len(images_from_bytes) == 241)
@@ -130,7 +146,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_path_using_dir_241(self): # pragma: no cover
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_241.pdf', output_folder=path)
             self.assertTrue(len(images_from_path) == 241)
             [im.close() for im in images_from_path]
@@ -177,7 +193,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_bytes_using_dir_14_first_page_12(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, first_page=12)
                 self.assertTrue(len(images_from_bytes) == 3)
@@ -187,7 +203,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_path_using_dir_14_first_page_12(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, first_page=12)
             self.assertTrue(len(images_from_path) == 3)
             [im.close() for im in images_from_path]
@@ -213,7 +229,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_bytes_using_dir_14_last_page_12(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, last_page=12)
                 self.assertTrue(len(images_from_bytes) == 12)
@@ -223,7 +239,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_path_using_dir_14_last_page_12(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, last_page=12)
             self.assertTrue(len(images_from_path) == 12)
             [im.close() for im in images_from_path]
@@ -249,7 +265,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_bytes_using_dir_14_first_page_2_last_page_12(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, first_page=2, last_page=12)
                 self.assertTrue(len(images_from_bytes) == 11)
@@ -259,7 +275,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_path_using_dir_14_first_page_2_last_page_12(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, first_page=2, last_page=12)
             self.assertTrue(len(images_from_path) == 11)
             [im.close() for im in images_from_path]
@@ -278,7 +294,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_to_jpeg_from_path_using_dir(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, fmt='jpeg')
             self.assertTrue(images_from_path[0].format == 'JPEG')
             [im.close() for im in images_from_path]
@@ -297,7 +313,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_to_png_from_path_using_dir(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, fmt='png')
             self.assertTrue(images_from_path[0].format == 'PNG')
             [im.close() for im in images_from_path]
@@ -318,7 +334,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_format_that_starts_with_a_dot(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg')
                 self.assertTrue(len(images_from_bytes) == 1)
@@ -330,7 +346,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_locked_pdf_with_userpw_only(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_locked_user_only.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg', userpw='pdf2image')
                 self.assertTrue(len(images_from_bytes) == 1)
@@ -340,7 +356,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_not_locked_pdf(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg', userpw='pdf2image')
                 self.assertTrue(len(images_from_bytes) == 1)
@@ -350,7 +366,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_locked_pdf_with_ownerpw_only(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_locked_owner_only.pdf', 'rb') as pdf_file:
                 # No need to pass a ownerpw because the absence of userpw means we can read it anyway
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg')
@@ -361,7 +377,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_locked_pdf_with_ownerpw_and_userpw(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_locked_both.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, fmt='.jpg', userpw='pdf2image')
                 self.assertTrue(len(images_from_bytes) == 1)
@@ -388,7 +404,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_bytes_using_dir_14_with_4_threads(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_14.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, thread_count=4)
                 self.assertTrue(len(images_from_bytes) == 14)
@@ -398,7 +414,7 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     def test_conversion_from_path_using_dir_14_with_4_threads(self):
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, thread_count=4)
             self.assertTrue(len(images_from_path) == 14)
             [im.close() for im in images_from_path]
@@ -425,7 +441,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_bytes_using_dir_241_with_4_threads(self): # pragma: no cover
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             with open('./tests/test_241.pdf', 'rb') as pdf_file:
                 images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, thread_count=4)
                 self.assertTrue(len(images_from_bytes) == 241)
@@ -436,7 +452,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf("TRAVIS" in os.environ and os.environ["TRAVIS"] == "true", "Skipping this test on Travis CI.")
     def test_conversion_from_path_using_dir_241_with_4_threads(self): # pragma: no cover
         start_time = time.time()
-        with tempfile.TemporaryDirectory() as path:
+        with TemporaryDirectory() as path:
             images_from_path = convert_from_path('./tests/test_241.pdf', output_folder=path, thread_count=4)
             self.assertTrue(len(images_from_path) == 241)
             [im.close() for im in images_from_path]
