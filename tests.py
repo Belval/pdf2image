@@ -402,6 +402,21 @@ class PDFConversionMethods(unittest.TestCase):
         print('test_conversion_from_path_14_with_4_thread: {} sec'.format((time.time() - start_time) / 14.))
 
     @profile
+    def test_conversion_from_bytes_14_with_15_threads(self):
+        start_time = time.time()
+        with open('./tests/test_14.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), thread_count=15)
+            self.assertTrue(len(images_from_bytes) == 14)
+        print('test_conversion_from_bytes_14_with_15_thread: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    def test_conversion_from_path_14_with_0_threads(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test_14.pdf', thread_count=0)
+        self.assertTrue(len(images_from_path) == 14)
+        print('test_conversion_from_path_14_with_4_thread: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
     def test_conversion_from_bytes_using_dir_14_with_4_threads(self):
         start_time = time.time()
         with TemporaryDirectory() as path:
