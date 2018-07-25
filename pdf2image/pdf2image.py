@@ -157,12 +157,13 @@ def __page_count(pdf_path, userpw=None):
     else:
         proc = Popen(["pdfinfo", pdf_path], stdout=PIPE, stderr=PIPE)
 
-    out, _ = proc.communicate()
+    out, err = proc.communicate()
+
     try:
         # This will throw if we are unable to get page count
         return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
     except:
-        raise Exception('Unable to get page count.')
+        raise Exception('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
 def __load_from_output_folder(output_folder, uid):
     return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if uid in f]
