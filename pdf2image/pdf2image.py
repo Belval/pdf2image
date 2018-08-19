@@ -152,12 +152,16 @@ def __parse_buffer_to_png(data):
     return images
 
 def __page_count(pdf_path, userpw=None):
-    if userpw is not None:
-        proc = Popen(["pdfinfo", pdf_path, '-upw', userpw], stdout=PIPE, stderr=PIPE)
-    else:
-        proc = Popen(["pdfinfo", pdf_path], stdout=PIPE, stderr=PIPE)
+    try:
+        if userpw is not None:
+            proc = Popen(["pdfinfo", pdf_path, '-upw', userpw], stdout=PIPE, stderr=PIPE)
+        else:
+            proc = Popen(["pdfinfo", pdf_path], stdout=PIPE, stderr=PIPE)
 
-    out, err = proc.communicate()
+        out, err = proc.communicate()
+    except:
+        raise Exception('Unable to get page count. Is poppler installed and in PATH?')
+
 
     try:
         # This will throw if we are unable to get page count
