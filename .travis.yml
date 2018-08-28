@@ -15,4 +15,6 @@ install:
 script:
   - python tests.py
   - coverage run tests.py
+  - sudo apt-get remove poppler-utils
+  - coverage run -a tests.py
   - codecov
