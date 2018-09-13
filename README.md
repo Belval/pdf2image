@@ -7,7 +7,7 @@ A python 2.7 and 3.3+ module that wraps the pdftoppm utility to convert PDF to a
 
 pdftoppm is the piece of software that does the actual magic. It is distributed as part of a greater package called [poppler](https://poppler.freedesktop.org/).
 
-Windows users will have to install [poppler for Windows](http://blog.alivate.com.au/poppler-windows/).
+Windows users will have to install [poppler for Windows](http://blog.alivate.com.au/poppler-windows/), then add the `bin/` folder to [PATH](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/).
 
 Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/).
 
@@ -20,7 +20,8 @@ Linux users will have pdftoppm pre-installed with the distro (Tested on Ubuntu a
 Install `Pillow` if you don't have it already with `pip install pillow`
 
 ## How does it work?
-` from pdf2image import convert_from_path, convert_from_bytes `
+
+`from pdf2image import convert_from_path, convert_from_bytes`
 
 Then simply do:
 
