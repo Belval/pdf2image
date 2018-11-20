@@ -429,7 +429,47 @@ class PDFConversionMethods(unittest.TestCase):
                 [im.close() for im in images_from_bytes]
         print('test_locked_pdf_with_ownerpw_and_userpw: {} sec'.format(time.time() - start_time))
 
-    ## Test multithreading
+    ## Tests cropbox
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_bytes_using_cropbox(self):
+        start_time = time.time()
+        with open('./tests/test.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), use_cropbox=True)
+            self.assertTrue(len(images_from_bytes) == 1)
+        print('test_conversion_from_bytes_using_cropbox: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_cropbox(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test.pdf', use_cropbox=True)
+        self.assertTrue(len(images_from_path) == 1)
+        print('test_conversion_from_path_using_cropbox: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_bytes_using_dir_and_cropbox(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            with open('./tests/test.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, use_cropbox=True)
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_conversion_from_bytes_using_dir_and_cropbox: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_dir_and_cropbox(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, use_cropbox=True)
+            self.assertTrue(len(images_from_path) == 1)
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_and_cropbox: {} sec'.format(time.time() - start_time))
+
+    ## Tests multithreading
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")

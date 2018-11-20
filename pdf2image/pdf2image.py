@@ -12,7 +12,7 @@ from io import BytesIO
 from subprocess import Popen, PIPE
 from PIL import Image
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None):
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -24,6 +24,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             fmt -> Output image format
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
+            use_cropbox -> Use cropbox instead of mediabox 
     """
 
     page_count = __page_count(pdf_path, userpw)
@@ -52,7 +53,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw)
+        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw, use_cropbox)
         # Update page values
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
@@ -60,6 +61,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         processes.append((uid, Popen(args, stdout=PIPE, stderr=PIPE)))
 
     images = []
+
     for uid, proc in processes:
         data, _ = proc.communicate()
 
@@ -70,7 +72,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -82,14 +84,18 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             fmt -> Output image format
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
+            use_cropbox -> Use cropbox instead of mediabox
     """
 
     with tempfile.NamedTemporaryFile('wb') as f:
         f.write(pdf_file)
         f.flush()
-        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw)
+        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox)
 
-def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw):
+def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox):
+    if use_cropbox:
+        args.append('-cropbox')
+
     if first_page is not None:
         args.extend(['-f', str(first_page)])
 
@@ -161,7 +167,6 @@ def __page_count(pdf_path, userpw=None):
         out, err = proc.communicate()
     except:
         raise Exception('Unable to get page count. Is poppler installed and in PATH?')
-
 
     try:
         # This will throw if we are unable to get page count
