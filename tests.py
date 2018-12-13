@@ -26,6 +26,7 @@ from memory_profiler import profile as profile_memory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pdf2image import convert_from_bytes, convert_from_path
+from pdf2image.exceptions import MissingFontError, PageCountError
 
 from functools import wraps
 
