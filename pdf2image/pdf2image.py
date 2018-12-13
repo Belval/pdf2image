@@ -12,7 +12,7 @@ from io import BytesIO
 from subprocess import Popen, PIPE
 from PIL import Image
 
-from pdf2image.exceptions import PageCountError, MissingFontError
+from .exceptions import PageCountError, MissingFontError
 
 def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False):
     """

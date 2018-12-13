@@ -54,12 +54,15 @@ Here are the definitions:
 `convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', use_cropbox=False)`
 
 ## What's new?
+
+- Error handling is now possible through custom Exceptions
+    - PageCountError: When pdf2image was unable to get the PDF's page count
+    - MissingFontError: When a font needed for the conversion is not found
 - `use_cropbox` parameter allows you to use the crop box instead of the media box when converting (`-cropbox` in pdftoppm's CLI)
 - `userpw` parameter allows you to set a password to unlock the converted PDF (`-upw` in pdftoppm's CLI)
 - `thread_count` parameter allows you to set how many thread will be used for conversion.
 - `first_page` parameter allows you to set a first page to be processed by pdftoppm (`-f` in pdftoppm's CLI)
 - `last_page` parameter allows you to set a last page to be processed by pdftoppm (`-l` in pdftoppm's CLI)
-- `fmt` parameter allows you to specify an output format. Currently supported formats are `jpg`, `png`, and `ppm`
 
 ## Performance tips
 
