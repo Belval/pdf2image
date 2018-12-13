@@ -12,6 +12,8 @@ from io import BytesIO
 from subprocess import Popen, PIPE
 from PIL import Image
 
+from pdf2image.exceptions import PageCountError, MissingFontError
+
 def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -63,7 +65,10 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     images = []
 
     for uid, proc in processes:
-        data, _ = proc.communicate()
+        data, err = proc.communicate()
+
+        if b"Couldn't find a font for" in err:
+            raise MissingFontError()
 
         if output_folder is not None:
             images += __load_from_output_folder(output_folder, uid)
@@ -166,13 +171,13 @@ def __page_count(pdf_path, userpw=None):
 
         out, err = proc.communicate()
     except:
-        raise Exception('Unable to get page count. Is poppler installed and in PATH?')
+        raise PageCountError('Unable to get page count. Is poppler installed and in PATH?')
 
     try:
         # This will throw if we are unable to get page count
         return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
     except:
-        raise Exception('Unable to get page count. %s' % err.decode("utf8", "ignore"))
+        raise PageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
 def __load_from_output_folder(output_folder, uid):
     return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if uid in f]
