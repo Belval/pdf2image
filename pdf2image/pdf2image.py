@@ -26,7 +26,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             fmt -> Output image format
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
-            use_cropbox -> Use cropbox instead of mediabox 
+            use_cropbox -> Use cropbox instead of mediabox
     """
 
     page_count = __page_count(pdf_path, userpw)
