@@ -12,7 +12,13 @@ from io import BytesIO
 from subprocess import Popen, PIPE
 from PIL import Image
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False):
+from .exceptions import (
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
+)
+
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -24,7 +30,8 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             fmt -> Output image format
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
-            use_cropbox -> Use cropbox instead of mediabox 
+            use_cropbox -> Use cropbox instead of mediabox
+            strict -> When a Syntax Error is thrown, it will be raised as an Exception
     """
 
     page_count = __page_count(pdf_path, userpw)
@@ -63,7 +70,10 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     images = []
 
     for uid, proc in processes:
-        data, _ = proc.communicate()
+        data, err = proc.communicate()
+
+        if b"Syntax Error" in err and strict:
+            raise PDFSyntaxError()
 
         if output_folder is not None:
             images += __load_from_output_folder(output_folder, uid)
@@ -72,7 +82,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -85,12 +95,13 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
             use_cropbox -> Use cropbox instead of mediabox
+            strict -> When a Syntax Error is thrown, it will be raised as an Exception
     """
 
     with tempfile.NamedTemporaryFile('wb') as f:
         f.write(pdf_file)
         f.flush()
-        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox)
+        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict)
 
 def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox):
     if use_cropbox:
@@ -166,13 +177,13 @@ def __page_count(pdf_path, userpw=None):
 
         out, err = proc.communicate()
     except:
-        raise Exception('Unable to get page count. Is poppler installed and in PATH?')
+        raise PDFInfoNotInstalledError('Unable to get page count. Is poppler installed and in PATH?')
 
     try:
         # This will throw if we are unable to get page count
         return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
     except:
-        raise Exception('Unable to get page count. %s' % err.decode("utf8", "ignore"))
+        raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
 def __load_from_output_folder(output_folder, uid):
     return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if uid in f]

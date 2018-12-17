@@ -22,6 +22,13 @@ Install `Pillow` if you don't have it already with `pip install pillow`
 ## How does it work?
 
 `from pdf2image import convert_from_path, convert_from_bytes`
+``` py
+from pdf2image.exceptions import (
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
+)
+```
 
 Then simply do:
 
@@ -49,17 +56,18 @@ with tempfile.TemporaryDirectory() as path:
 
 Here are the definitions:
 
-`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', use_cropbox=False)`
+`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False)`
 
-`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', use_cropbox=False)`
+`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False)`
 
 ## What's new?
+
+- `strict` parameter allows you to catch pdftoppm syntax error with a custom type `PDFSyntaxError`
 - `use_cropbox` parameter allows you to use the crop box instead of the media box when converting (`-cropbox` in pdftoppm's CLI)
 - `userpw` parameter allows you to set a password to unlock the converted PDF (`-upw` in pdftoppm's CLI)
 - `thread_count` parameter allows you to set how many thread will be used for conversion.
 - `first_page` parameter allows you to set a first page to be processed by pdftoppm (`-f` in pdftoppm's CLI)
 - `last_page` parameter allows you to set a last page to be processed by pdftoppm (`-l` in pdftoppm's CLI)
-- `fmt` parameter allows you to specify an output format. Currently supported formats are `jpg`, `png`, and `ppm`
 
 ## Performance tips
 

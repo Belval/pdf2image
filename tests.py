@@ -26,6 +26,11 @@ from memory_profiler import profile as profile_memory
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from pdf2image import convert_from_bytes, convert_from_path
+from pdf2image.exceptions import (
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
+)
 
 from functools import wraps
 
@@ -568,16 +573,29 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_241_with_4_thread: {} sec'.format((time.time() - start_time) / 241.))
 
+    # Testing custom exceptions
+
     @unittest.skipIf(POPPLER_INSTALLED, "Poppler is installed, skipping.")
     def test_pdfinfo_not_installed_throws(self):
         start_time = time.time()
         try:
             images_from_path = convert_from_path('./tests/test_14.pdf')
             raise Exception("This should not happen")
-        except:
+        except PDFInfoNotInstalledError as ex:
             pass
 
         print('test_pdfinfo_not_installed_throws: {} sec'.format((time.time() - start_time) / 14.))
+
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_missingfonterror_throws(self):
+        start_time = time.time()        
+        try:
+            images_from_path = convert_from_path('./tests/test_strict.pdf', strict=True)
+            raise Exception("This should not happen")
+        except PDFSyntaxError as ex:
+            pass
+
+        print('test_syntaxerror_throws: {} sec'.format(time.time() - start_time))
 
 if __name__=='__main__':
     unittest.main()
