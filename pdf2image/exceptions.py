@@ -2,10 +2,14 @@
     Define exceptions specific to pdf2image
 """
 
-class PageCountError(Exception):
-    "Happens when the pdfinfo tool is not installed on the host"
+class PDFInfoNotInstalledError(Exception):
+    "Happens when pdfinfo is not installed"
     pass
 
-class MissingFontError(Exception):
-    "Happens when a font is missing from the host"
+class PageCountError(Exception):
+    "Happens when the pdfinfo was unable to retrieve the page count"
+    pass
+
+class PDFSyntaxError(Exception):
+    "Syntax error was thrown during rendering"
     pass
