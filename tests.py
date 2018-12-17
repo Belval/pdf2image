@@ -27,9 +27,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 from pdf2image import convert_from_bytes, convert_from_path
 from pdf2image.exceptions import (
-    PDFSyntaxError,
-    PageCountError,
-    PDFInfoNotInstalledError
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
 )
 
 from functools import wraps
@@ -581,7 +581,7 @@ class PDFConversionMethods(unittest.TestCase):
         try:
             images_from_path = convert_from_path('./tests/test_14.pdf')
             raise Exception("This should not happen")
-        except:
+        except PDFInfoNotInstalledError as ex:
             pass
 
         print('test_pdfinfo_not_installed_throws: {} sec'.format((time.time() - start_time) / 14.))

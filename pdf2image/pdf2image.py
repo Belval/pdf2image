@@ -13,7 +13,8 @@ from subprocess import Popen, PIPE
 from PIL import Image
 
 from .exceptions import (
-    PageCountError,
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
     PDFSyntaxError
 )
 
@@ -176,13 +177,13 @@ def __page_count(pdf_path, userpw=None):
 
         out, err = proc.communicate()
     except:
-        raise PageCountError('Unable to get page count. Is poppler installed and in PATH?')
+        raise PDFInfoNotInstalledError('Unable to get page count. Is poppler installed and in PATH?')
 
     try:
         # This will throw if we are unable to get page count
         return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
     except:
-        raise PageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
+        raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
 def __load_from_output_folder(output_folder, uid):
     return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if uid in f]

@@ -6,7 +6,7 @@ class PDFInfoNotInstalledError(Exception):
     "Happens when pdfinfo is not installed"
     pass
 
-class PageCountError(Exception):
+class PDFPageCountError(Exception):
     "Happens when the pdfinfo was unable to retrieve the page count"
     pass
 
