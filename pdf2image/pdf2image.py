@@ -73,7 +73,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         data, err = proc.communicate()
 
         if b"Syntax Error" in err and strict:
-            raise PDFSyntaxError()
+            raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
         if output_folder is not None:
             images += __load_from_output_folder(output_folder, uid)
