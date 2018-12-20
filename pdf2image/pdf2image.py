@@ -18,7 +18,7 @@ from .exceptions import (
     PDFSyntaxError
 )
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False):
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -32,6 +32,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             userpw -> PDF's password
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
+            transparent -> Output with a transparent background instead of a white one.
     """
 
     page_count = __page_count(pdf_path, userpw)
@@ -60,7 +61,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args, parse_buffer_func = __build_command(['pdftoppm', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw, use_cropbox)
+        args, parse_buffer_func = __build_command(['pdftocairo', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw, use_cropbox, transparent)
         # Update page values
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
@@ -72,6 +73,8 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     for uid, proc in processes:
         data, err = proc.communicate()
 
+        print(err)
+
         if b"Syntax Error" in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
@@ -80,9 +83,11 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         else:
             images += parse_buffer_func(data)
 
+    print(len(images))
+
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -96,24 +101,28 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             userpw -> PDF's password
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
+            transparent -> Output with a transparent background instead of a white one.
     """
 
     with tempfile.NamedTemporaryFile('wb') as f:
         f.write(pdf_file)
         f.flush()
-        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict)
+        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent)
 
-def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox):
+def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox, transparent):
     if use_cropbox:
         args.append('-cropbox')
+
+    parsed_format, parse_buffer_func = __parse_format(fmt)
+
+    if transparent and parsed_format == 'png':
+        args.append('-transp')
 
     if first_page is not None:
         args.extend(['-f', str(first_page)])
 
     if last_page is not None:
         args.extend(['-l', str(last_page)])
-
-    parsed_format, parse_buffer_func = __parse_format(fmt)
 
     if parsed_format != 'ppm':
         args.append('-' + parsed_format)
@@ -134,7 +143,7 @@ def __parse_format(fmt):
     if fmt == 'png':
         return 'png', __parse_buffer_to_png
     # Unable to parse the format so we'll use the default
-    return 'ppm', __parse_buffer_to_ppm
+    return 'jpeg', __parse_buffer_to_ppm
 
 def __parse_buffer_to_ppm(data):
     images = []
