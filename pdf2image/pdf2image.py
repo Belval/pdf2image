@@ -53,7 +53,7 @@ from .exceptions import (
     PDFSyntaxError
 )
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='jpeg', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -113,17 +113,18 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     for uid, proc in processes:
         _, err = proc.communicate()
 
-        if err is not None and strict:
+        if b'Syntax Error'in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
         images += __load_from_output_folder(output_folder, uid, in_memory=(temp_dir is not None))
 
     if temp_dir is not None:
+        temp_dir.cleanup()
         del temp_dir
 
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='jpeg', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -160,8 +161,7 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw
     if last_page is not None:
         args.extend(['-l', str(last_page)])
 
-    if parsed_format != 'ppm':
-        args.append('-' + parsed_format)
+    args.append('-' + parsed_format)
 
     if output_folder is not None:
         args.append(os.path.join(output_folder, uid))
@@ -172,9 +172,10 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw
     return args
 
 def __parse_format(fmt):
+    fmt = fmt.lower()
     if fmt[0] == '.':
         fmt = fmt[1:]
-    if fmt == 'jpeg' or fmt == 'jpg':
+    if fmt in ('jpeg', 'jpg'):
         return 'jpeg'
     if fmt == 'png':
         return 'png'
@@ -205,3 +206,4 @@ def __load_from_output_folder(output_folder, uid, in_memory=False):
             images.append(Image.open(os.path.join(output_folder, f)))
             if in_memory:
                 images[-1].load()
+    return images
