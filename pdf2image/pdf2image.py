@@ -5,11 +5,46 @@
 
 import os
 import re
-import tempfile
 import uuid
 
-from io import BytesIO
+# polyfill for python27
+try:
+    from tempfile import (
+        TemporaryDirectory,
+        NamedTemporaryFile
+    )
+except ImportError:
+    import tempfile
+    import shutil
+
+    class TemporaryDirectory(object):
+        def __init__(self):
+            self.name = tempfile.mkdtemp()
+
+        def __enter__(self):
+            return self.name
+
+        def __exit__(self, exc, value, tb):
+            self.cleanup()
+
+        def cleanup(self):
+            shutil.rmtree(self.name)
+
+        def __del__(self):
+            self.cleanup()
+
+    class NamedTemporaryFile(object):
+        def __init__(self):
+            self.name = tempfile.mkstemp()
+
+        def __enter__(self):
+            return self.name
+
+        def __exit__(self, exc, value, tb):
+            os.remove(self.name)
+
 from subprocess import Popen, PIPE
+from io import BytesIO
 from PIL import Image
 
 from .exceptions import (
@@ -46,6 +81,11 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     if last_page is None or last_page > page_count:
         last_page = page_count
 
+    temp_dir = None
+    if output_folder is None:
+        temp_dir = TemporaryDirectory('wb')
+        output_folder = temp_dir.name
+
     # Recalculate page count based on first and last page
     page_count = last_page - first_page + 1
 
@@ -61,7 +101,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args, parse_buffer_func = __build_command(['pdftocairo', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw, use_cropbox, transparent)
+        args = __build_command(['pdftocairo', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw, use_cropbox, transparent)
         # Update page values
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
@@ -71,19 +111,15 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     images = []
 
     for uid, proc in processes:
-        data, err = proc.communicate()
+        _, err = proc.communicate()
 
-        print(err)
-
-        if b"Syntax Error" in err and strict:
+        if err is not None and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
-        if output_folder is not None:
-            images += __load_from_output_folder(output_folder, uid)
-        else:
-            images += parse_buffer_func(data)
+        images += __load_from_output_folder(output_folder, uid, in_memory=(temp_dir is not None))
 
-    print(len(images))
+    if temp_dir is not None:
+        del temp_dir
 
     return images
 
@@ -104,7 +140,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             transparent -> Output with a transparent background instead of a white one.
     """
 
-    with tempfile.NamedTemporaryFile('wb') as f:
+    with NamedTemporaryFile('wb') as f:
         f.write(pdf_file)
         f.flush()
         return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent)
@@ -113,7 +149,7 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw
     if use_cropbox:
         args.append('-cropbox')
 
-    parsed_format, parse_buffer_func = __parse_format(fmt)
+    parsed_format = __parse_format(fmt)
 
     if transparent and parsed_format == 'png':
         args.append('-transp')
@@ -133,49 +169,17 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw
     if userpw is not None:
         args.extend(['-upw', userpw])
 
-    return args, parse_buffer_func
+    return args
 
 def __parse_format(fmt):
     if fmt[0] == '.':
         fmt = fmt[1:]
     if fmt == 'jpeg' or fmt == 'jpg':
-        return 'jpeg', __parse_buffer_to_jpeg
+        return 'jpeg'
     if fmt == 'png':
-        return 'png', __parse_buffer_to_png
+        return 'png'
     # Unable to parse the format so we'll use the default
-    return 'jpeg', __parse_buffer_to_ppm
-
-def __parse_buffer_to_ppm(data):
-    images = []
-
-    index = 0
-
-    while index < len(data):
-        code, size, rgb = tuple(data[index:index + 40].split(b'\n')[0:3])
-        size_x, size_y = tuple(size.split(b' '))
-        file_size = len(code) + len(size) + len(rgb) + 3 + int(size_x) * int(size_y) * 3
-        images.append(Image.open(BytesIO(data[index:index + file_size])))
-        index += file_size
-
-    return images
-
-def __parse_buffer_to_jpeg(data):
-    return [
-        Image.open(BytesIO(image_data + b'\xff\xd9'))
-        for image_data in data.split(b'\xff\xd9')[:-1] # Last element is obviously empty
-    ]
-
-def __parse_buffer_to_png(data):
-    images = []
-
-    index = 0
-
-    while index < len(data):
-        file_size = data[index:].index(b'IEND') + 8 # 4 bytes for IEND + 4 bytes for CRC
-        images.append(Image.open(BytesIO(data[index:index+file_size])))
-        index += file_size
-
-    return images
+    return 'jpeg'
 
 def __page_count(pdf_path, userpw=None):
     try:
@@ -194,5 +198,10 @@ def __page_count(pdf_path, userpw=None):
     except:
         raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
-def __load_from_output_folder(output_folder, uid):
-    return [Image.open(os.path.join(output_folder, f)) for f in sorted(os.listdir(output_folder)) if uid in f]
+def __load_from_output_folder(output_folder, uid, in_memory=False):
+    images = []
+    for f in sorted(os.listdir(output_folder)):
+        if uid in f:
+            images.append(Image.open(os.path.join(output_folder, f)))
+            if in_memory:
+                images[-1].load()
