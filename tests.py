@@ -597,5 +597,66 @@ class PDFConversionMethods(unittest.TestCase):
 
         print('test_syntaxerror_throws: {} sec'.format(time.time() - start_time))
 
+    # Test transparent
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_bytes_using_transparent(self):
+        start_time = time.time()
+        with open('./tests/test.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), transparent=True)
+            self.assertTrue(len(images_from_bytes) == 1)
+        print('test_conversion_from_bytes_using_transparent: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_transparent(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test.pdf', transparent=True)
+        self.assertTrue(len(images_from_path) == 1)
+        print('test_conversion_from_path_using_transparent: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_bytes_using_dir_and_transparent(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            with open('./tests/test.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, transparent=True)
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print('test_conversion_from_bytes_using_dir_and_transparent: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_dir_and_transparent(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, transparent=True)
+            self.assertTrue(len(images_from_path) == 1)
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_and_transparent: {} sec'.format(time.time() - start_time))
+
+    ## Test output as TIFF
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_tiff_from_bytes(self):
+        start_time = time.time()
+        with open('./tests/test.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt='tiff')
+            self.assertTrue(images_from_bytes[0].format == 'TIFF')
+        print('test_conversion_to_tiff_from_bytes_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_tiff_from_path_using_dir(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, fmt='tiff')
+            self.assertTrue(images_from_path[0].format == 'TIFF')
+            [im.close() for im in images_from_path]
+        print('test_conversion_to_tiff_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
+
 if __name__=='__main__':
     unittest.main()

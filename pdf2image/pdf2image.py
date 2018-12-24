@@ -18,6 +18,10 @@ except ImportError:
     import shutil
 
     class TemporaryDirectory(object):
+        """
+            polyfill for TemporaryDirectory
+        """
+
         def __init__(self):
             self.name = tempfile.mkdtemp()
 
@@ -28,12 +32,17 @@ except ImportError:
             self.cleanup()
 
         def cleanup(self):
+            """Delete the directory"""
             shutil.rmtree(self.name)
 
         def __del__(self):
             self.cleanup()
 
     class NamedTemporaryFile(object):
+        """
+            polyfill for NamedTemporaryFile
+        """
+
         def __init__(self):
             self.name = tempfile.mkstemp()
 
@@ -44,8 +53,13 @@ except ImportError:
             os.remove(self.name)
 
 from subprocess import Popen, PIPE
-from io import BytesIO
 from PIL import Image
+
+from .parsers import (
+    parse_buffer_to_ppm,
+    parse_buffer_to_jpeg,
+    parse_buffer_to_png
+)
 
 from .exceptions import (
     PDFInfoNotInstalledError,
@@ -70,7 +84,13 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             transparent -> Output with a transparent background instead of a white one.
     """
 
-    page_count = __page_count(pdf_path, userpw)
+    page_count = _page_count(pdf_path, userpw)
+
+    # We start by getting the output format, the buffer processing function and if we need pdftocairo
+    parsed_fmt, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt)
+
+    # We use pdftocairo is the format requires it OR we need a transparent output
+    use_pdfcairo = use_pdfcairo_format or transparent
 
     if thread_count < 1:
         thread_count = 1
@@ -82,7 +102,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         last_page = page_count
 
     temp_dir = None
-    if output_folder is None:
+    if output_folder is None and use_pdfcairo:
         temp_dir = TemporaryDirectory('wb')
         output_folder = temp_dir.name
 
@@ -101,7 +121,13 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args = __build_command(['pdftocairo', '-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, fmt, uid, userpw, use_cropbox, transparent)
+        args = _build_command(['-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, parsed_fmt, uid, userpw, use_cropbox, transparent)
+
+        if use_pdfcairo:
+            args = ['pdftocairo'] + args
+        else:
+            args = ['pdftoppm'] + args
+
         # Update page values
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
@@ -111,12 +137,15 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     images = []
 
     for uid, proc in processes:
-        _, err = proc.communicate()
+        data, err = proc.communicate()
 
         if b'Syntax Error'in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
-        images += __load_from_output_folder(output_folder, uid, in_memory=(temp_dir is not None))
+        if output_folder is not None:
+            images += _load_from_output_folder(output_folder, uid, in_memory=(temp_dir is not None))
+        else:
+            images += parse_buffer_func(data)
 
     if temp_dir is not None:
         temp_dir.cleanup()
@@ -146,13 +175,11 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
         f.flush()
         return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent)
 
-def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox, transparent):
+def _build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox, transparent):
     if use_cropbox:
         args.append('-cropbox')
 
-    parsed_format = __parse_format(fmt)
-
-    if transparent and parsed_format == 'png':
+    if transparent and fmt == 'png':
         args.append('-transp')
 
     if first_page is not None:
@@ -161,7 +188,7 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw
     if last_page is not None:
         args.extend(['-l', str(last_page)])
 
-    args.append('-' + parsed_format)
+    args.append('-' + fmt)
 
     if output_folder is not None:
         args.append(os.path.join(output_folder, uid))
@@ -171,18 +198,20 @@ def __build_command(args, output_folder, first_page, last_page, fmt, uid, userpw
 
     return args
 
-def __parse_format(fmt):
+def _parse_format(fmt):
     fmt = fmt.lower()
     if fmt[0] == '.':
         fmt = fmt[1:]
     if fmt in ('jpeg', 'jpg'):
-        return 'jpeg'
+        return 'jpeg', parse_buffer_to_jpeg, False
     if fmt == 'png':
-        return 'png'
+        return 'png', parse_buffer_to_png, False
+    if fmt in ('tif', 'tiff'):
+        return 'tiff', None, True
     # Unable to parse the format so we'll use the default
-    return 'jpeg'
+    return 'ppm', parse_buffer_to_ppm, False
 
-def __page_count(pdf_path, userpw=None):
+def _page_count(pdf_path, userpw=None):
     try:
         if userpw is not None:
             proc = Popen(["pdfinfo", pdf_path, '-upw', userpw], stdout=PIPE, stderr=PIPE)
@@ -199,7 +228,7 @@ def __page_count(pdf_path, userpw=None):
     except:
         raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
-def __load_from_output_folder(output_folder, uid, in_memory=False):
+def _load_from_output_folder(output_folder, uid, in_memory=False):
     images = []
     for f in sorted(os.listdir(output_folder)):
         if uid in f:
