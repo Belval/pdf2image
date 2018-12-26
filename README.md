@@ -1,17 +1,17 @@
 # pdf2image [![TravisCI](https://travis-ci.org/Belval/pdf2image.svg?branch=master)](https://travis-ci.org/Belval/pdf2image) [![PyPI version](https://badge.fury.io/py/pdf2image.svg)](https://badge.fury.io/py/pdf2image) [![codecov](https://codecov.io/gh/Belval/pdf2image/branch/master/graph/badge.svg)](https://codecov.io/gh/Belval/pdf2image)
-A python 2.7 and 3.3+ module that wraps the pdftoppm utility to convert PDF to a PIL Image object
+A python 2.7 and 3.3+ module that wraps pdftoppm and pdftocairo to convert PDF to a PIL Image object
 
 ## How to install
 
-### First you need pdftoppm
+### First you need poppler-utils
 
-pdftoppm is the piece of software that does the actual magic. It is distributed as part of a greater package called [poppler](https://poppler.freedesktop.org/).
+pdftoppm and pdftocairo are the piece of software that do the actual magic. It is distributed as part of a greater package called [poppler](https://poppler.freedesktop.org/).
 
 Windows users will have to install [poppler for Windows](http://blog.alivate.com.au/poppler-windows/), then add the `bin/` folder to [PATH](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/).
 
 Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/).
 
-Linux users will have pdftoppm pre-installed with Ubuntu 16.04+ and Archlinux. If it's not, run `sudo apt install poppler-utils`
+Linux users will have both tools pre-installed with Ubuntu 16.04+ and Archlinux. If it's not, run `sudo apt install poppler-utils`
 
 ### Then you can install the pip package!
 
@@ -56,12 +56,13 @@ with tempfile.TemporaryDirectory() as path:
 
 Here are the definitions:
 
-`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False)`
+`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False)`
 
-`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False)`
+`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False)`
 
 ## What's new?
-
+- `fmt='tiff'` parameter allowss you to create .tiff files (You need pdftocairo for this)
+- `transparent` parameter allows you to generate images with no background instead of the usual white one (You need pdftocairo for this)
 - `strict` parameter allows you to catch pdftoppm syntax error with a custom type `PDFSyntaxError`
 - `use_cropbox` parameter allows you to use the crop box instead of the media box when converting (`-cropbox` in pdftoppm's CLI)
 - `userpw` parameter allows you to set a password to unlock the converted PDF (`-upw` in pdftoppm's CLI)
