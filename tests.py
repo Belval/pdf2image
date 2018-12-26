@@ -604,7 +604,7 @@ class PDFConversionMethods(unittest.TestCase):
     def test_conversion_from_bytes_using_transparent(self):
         start_time = time.time()
         with open('./tests/test.pdf', 'rb') as pdf_file:
-            images_from_bytes = convert_from_bytes(pdf_file.read(), transparent=True)
+            images_from_bytes = convert_from_bytes(pdf_file.read(), transparent=True, fmt='png')
             self.assertTrue(len(images_from_bytes) == 1)
         print('test_conversion_from_bytes_using_transparent: {} sec'.format(time.time() - start_time))
 
@@ -612,7 +612,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_using_transparent(self):
         start_time = time.time()
-        images_from_path = convert_from_path('./tests/test.pdf', transparent=True)
+        images_from_path = convert_from_path('./tests/test.pdf', transparent=True, fmt='png')
         self.assertTrue(len(images_from_path) == 1)
         print('test_conversion_from_path_using_transparent: {} sec'.format(time.time() - start_time))
 
@@ -622,7 +622,7 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with TemporaryDirectory() as path:
             with open('./tests/test.pdf', 'rb') as pdf_file:
-                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, transparent=True)
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, transparent=True, fmt='png')
                 self.assertTrue(len(images_from_bytes) == 1)
                 [im.close() for im in images_from_bytes]
         print('test_conversion_from_bytes_using_dir_and_transparent: {} sec'.format(time.time() - start_time))
@@ -632,7 +632,7 @@ class PDFConversionMethods(unittest.TestCase):
     def test_conversion_from_path_using_dir_and_transparent(self):
         start_time = time.time()
         with TemporaryDirectory() as path:
-            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, transparent=True)
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, transparent=True, fmt='png')
             self.assertTrue(len(images_from_path) == 1)
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_and_transparent: {} sec'.format(time.time() - start_time))

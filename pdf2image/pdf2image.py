@@ -67,7 +67,7 @@ from .exceptions import (
     PDFSyntaxError
 )
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='jpeg', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -153,7 +153,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='jpeg', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -188,7 +188,8 @@ def _build_command(args, output_folder, first_page, last_page, fmt, uid, userpw,
     if last_page is not None:
         args.extend(['-l', str(last_page)])
 
-    args.append('-' + fmt)
+    if fmt != 'ppm':
+        args.append('-' + fmt)
 
     if output_folder is not None:
         args.append(os.path.join(output_folder, uid))
