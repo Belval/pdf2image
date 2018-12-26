@@ -6,51 +6,8 @@
 import os
 import re
 import uuid
-
-# polyfill for python27
-try:
-    from tempfile import (
-        TemporaryDirectory,
-        NamedTemporaryFile
-    )
-except ImportError:
-    import tempfile
-    import shutil
-
-    class TemporaryDirectory(object):
-        """
-            polyfill for TemporaryDirectory
-        """
-
-        def __init__(self):
-            self.name = tempfile.mkdtemp()
-
-        def __enter__(self):
-            return self.name
-
-        def __exit__(self, exc, value, tb):
-            self.cleanup()
-
-        def cleanup(self):
-            """Delete the directory"""
-            shutil.rmtree(self.name)
-
-        def __del__(self):
-            self.cleanup()
-
-    class NamedTemporaryFile(object):
-        """
-            polyfill for NamedTemporaryFile
-        """
-
-        def __init__(self):
-            self.name = tempfile.mkstemp()
-
-        def __enter__(self):
-            return self.name
-
-        def __exit__(self, exc, value, tb):
-            os.remove(self.name)
+import tempfile
+import shutil
 
 from subprocess import Popen, PIPE
 from PIL import Image
@@ -101,10 +58,10 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     if last_page is None or last_page > page_count:
         last_page = page_count
 
-    temp_dir = None
+    auto_temp_dir = False
     if output_folder is None and use_pdfcairo:
-        temp_dir = TemporaryDirectory('wb')
-        output_folder = temp_dir.name
+        auto_temp_dir = True
+        output_folder = tempfile.mkdtemp()
 
     # Recalculate page count based on first and last page
     page_count = last_page - first_page + 1
@@ -143,13 +100,12 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
         if output_folder is not None:
-            images += _load_from_output_folder(output_folder, uid, in_memory=(temp_dir is not None))
+            images += _load_from_output_folder(output_folder, uid, in_memory=auto_temp_dir)
         else:
             images += parse_buffer_func(data)
 
-    if temp_dir is not None:
-        temp_dir.cleanup()
-        del temp_dir
+    if auto_temp_dir:
+        shutil.rmtree(output_folder)
 
     return images
 
@@ -170,10 +126,14 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             transparent -> Output with a transparent background instead of a white one.
     """
 
-    with NamedTemporaryFile('wb') as f:
-        f.write(pdf_file)
-        f.flush()
-        return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent)
+    _, temp_filename = tempfile.mkstemp()
+    try:
+        with open(temp_filename, 'wb') as f:
+            f.write(pdf_file)
+            f.flush()
+            return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent)
+    finally:
+        os.remove(temp_filename)
 
 def _build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox, transparent):
     if use_cropbox:
