@@ -24,7 +24,7 @@ from .exceptions import (
     PDFSyntaxError
 )
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, out_file=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -73,8 +73,8 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     current_page = first_page
     processes = []
     for _ in range(thread_count):
-        # A unique identifier for our files if the directory is not empty
-        uid = str(uuid.uuid4())
+        # Get the filename of the output file.
+        out_file = pdf_path.rpartition('.')[0] if not out_file else out_file
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
@@ -89,7 +89,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
         # Spawn the process and save its uuid
-        processes.append((uid, Popen(args, stdout=PIPE, stderr=PIPE)))
+        processes.append((out_file, Popen(args, stdout=PIPE, stderr=PIPE)))
 
     images = []
 
@@ -109,7 +109,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
     return images
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, out_file=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -131,11 +131,11 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
         with open(temp_filename, 'wb') as f:
             f.write(pdf_file)
             f.flush()
-            return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent)
+            return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent, out_file=out_file)
     finally:
         os.remove(temp_filename)
 
-def _build_command(args, output_folder, first_page, last_page, fmt, uid, userpw, use_cropbox, transparent):
+def _build_command(args, output_folder, first_page, last_page, fmt, out_file, userpw, use_cropbox, transparent):
     if use_cropbox:
         args.append('-cropbox')
 
@@ -152,7 +152,7 @@ def _build_command(args, output_folder, first_page, last_page, fmt, uid, userpw,
         args.append('-' + fmt)
 
     if output_folder is not None:
-        args.append(os.path.join(output_folder, uid))
+        args.append(os.path.join(output_folder, out_file))
 
     if userpw is not None:
         args.extend(['-upw', userpw])
@@ -189,10 +189,10 @@ def _page_count(pdf_path, userpw=None):
     except:
         raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
-def _load_from_output_folder(output_folder, uid, in_memory=False):
+def _load_from_output_folder(output_folder, out_file, in_memory=False):
     images = []
     for f in sorted(os.listdir(output_folder)):
-        if uid in f:
+        if out_file in f:
             images.append(Image.open(os.path.join(output_folder, f)))
             if in_memory:
                 images[-1].load()
