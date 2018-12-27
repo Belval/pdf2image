@@ -78,7 +78,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args = _build_command(['-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, parsed_fmt, uid, userpw, use_cropbox, transparent)
+        args = _build_command(['-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, parsed_fmt, out_file, userpw, use_cropbox, transparent)
 
         if use_pdfcairo:
             args = ['pdftocairo'] + args
