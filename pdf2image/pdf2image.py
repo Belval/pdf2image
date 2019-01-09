@@ -24,6 +24,8 @@ from .exceptions import (
     PDFSyntaxError
 )
 
+TRANSPARENT_FILE_TYPES = ['png', 'tiff']
+
 def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, output_file=str(uuid.uuid4())):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -47,7 +49,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     parsed_fmt, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt)
 
     # We use pdftocairo is the format requires it OR we need a transparent output
-    use_pdfcairo = use_pdfcairo_format or transparent
+    use_pdfcairo = use_pdfcairo_format or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
 
     if thread_count < 1:
         thread_count = 1
@@ -138,7 +140,7 @@ def _build_command(args, output_folder, first_page, last_page, fmt, output_file,
     if use_cropbox:
         args.append('-cropbox')
 
-    if transparent and fmt == 'png':
+    if transparent and fmt in TRANSPARENT_FILE_TYPES:
         args.append('-transp')
 
     if first_page is not None:

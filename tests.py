@@ -637,6 +637,15 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_and_transparent: {} sec'.format(time.time() - start_time))
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_transparent_without_png(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test.pdf', transparent=True)
+        self.assertTrue(len(images_from_path) == 1)
+        [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_transparent_without_png: {} sec'.format(time.time() - start_time))
+
     ## Test output as TIFF
 
     @profile
