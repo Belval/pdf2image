@@ -675,7 +675,7 @@ class PDFConversionMethods(unittest.TestCase):
     def test_close_tempfile_after_conversion(self):
         start_time = time.time()
         with open('./tests/test.pdf', 'rb') as pdf_file:
-            fd_count_before = len(subprocess.check_output(['ls', '-l', f'/proc/{os.getpid()}/fd']).decode('utf8').split('\n'))
+            fd_count_before = len(subprocess.check_output(['ls', '-l', '/proc/' + os.getpid() + '/fd']).decode('utf8').split('\n'))
             pdf_data = pdf_file.read()
             images_from_bytes = []
             for i in range(50):
@@ -683,7 +683,7 @@ class PDFConversionMethods(unittest.TestCase):
             # Closing the images
             [im.close() for im in images_from_bytes]
             pid = os.getpid()
-            fd_count_after = len(subprocess.check_output(['ls', '-l', f'/proc/{os.getpid()}/fd']).decode('utf8').split('\n'))
+            fd_count_after = len(subprocess.check_output(['ls', '-l', '/proc/' + os.getpid() + '/fd']).decode('utf8').split('\n'))
             self.assertTrue(fd_count_before == fd_count_after)
         print('test_close_tempfile_after_conversion: {} sec'.format((time.time() - start_time)))
 
