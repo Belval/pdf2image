@@ -134,7 +134,6 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             f.flush()
             return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent, output_file=output_file)
     finally:
-        print('Closing them files')
         os.close(fh)
         os.remove(temp_filename)
 
