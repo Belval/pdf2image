@@ -667,5 +667,26 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_to_tiff_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
 
+    ## Test hanging file handles
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    @unittest.skipIf(not os.name == 'posix', "This test only works on posix systems")
+    def test_close_tempfile_after_conversion(self):
+        start_time = time.time()
+        with open('./tests/test.pdf', 'rb') as pdf_file:
+            fd_count_before = len(subprocess.check_output(['ls', '-l', '/proc/' + str(os.getpid()) + '/fd']).decode('utf8').split('\n'))
+            pdf_data = pdf_file.read()
+            images_from_bytes = []
+            for i in range(50):
+                images_from_bytes.extend(convert_from_bytes(pdf_data))
+            # Closing the images
+            [im.close() for im in images_from_bytes]
+            pid = os.getpid()
+            fd_count_after = len(subprocess.check_output(['ls', '-l', '/proc/' + str(os.getpid()) + '/fd']).decode('utf8').split('\n'))
+            # Add an error margin
+            self.assertTrue(abs(fd_count_before - fd_count_after) <= 3)
+        print('test_close_tempfile_after_conversion: {} sec'.format((time.time() - start_time)))
+
 if __name__=='__main__':
     unittest.main()

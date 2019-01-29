@@ -127,13 +127,14 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             transparent -> Output with a transparent background instead of a white one.
     """
 
-    _, temp_filename = tempfile.mkstemp()
+    fh, temp_filename = tempfile.mkstemp()
     try:
         with open(temp_filename, 'wb') as f:
             f.write(pdf_file)
             f.flush()
             return convert_from_path(f.name, dpi=dpi, output_folder=output_folder, first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count, userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent, output_file=output_file)
     finally:
+        os.close(fh)
         os.remove(temp_filename)
 
 def _build_command(args, output_folder, first_page, last_page, fmt, output_file, userpw, use_cropbox, transparent):
