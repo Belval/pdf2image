@@ -41,11 +41,15 @@ def parse_buffer_to_png(data):
 
     images = []
 
-    index = 0
-
-    while index < len(data):
-        file_size = data[index:].index(b'IEND') + 8 # 4 bytes for IEND + 4 bytes for CRC
-        images.append(Image.open(BytesIO(data[index:index+file_size])))
-        index += file_size
+    c1 = 0
+    c2 = 0
+    data_len = len(data)
+    while c1 < data_len:
+        # IEND can appear in a PNG without being the actual end
+        if data[c2:c2 + 4] == b'IEND' and (c2 + 8 == data_len or data[c2+9:c2+12] == b'PNG'):
+            images.append(Image.open(BytesIO(data[c1:c2 + 8])))
+            c1 = c2 + 8
+            c2 = c1
+        c2 += 1
 
     return images
