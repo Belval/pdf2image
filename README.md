@@ -61,14 +61,14 @@ Here are the definitions:
 `convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False)`
 
 ## What's new?
--  Fixed a bug that left open file descriptors when using `convert_from_bytes()` (Thank you @FabianUken)
+- Fixed a bug where PNGs buffer with a non-terminating I-E-N-D sequence would throw an exception   
+- Fixed a bug that left open file descriptors when using `convert_from_bytes()` (Thank you @FabianUken)
 - `fmt='tiff'` parameter allowss you to create .tiff files (You need pdftocairo for this)
 - `transparent` parameter allows you to generate images with no background instead of the usual white one (You need pdftocairo for this)
 - `strict` parameter allows you to catch pdftoppm syntax error with a custom type `PDFSyntaxError`
 - `use_cropbox` parameter allows you to use the crop box instead of the media box when converting (`-cropbox` in pdftoppm's CLI)
 - `userpw` parameter allows you to set a password to unlock the converted PDF (`-upw` in pdftoppm's CLI)
 - `thread_count` parameter allows you to set how many thread will be used for conversion.
-- `first_page` parameter allows you to set a first page to be processed by pdftoppm (`-f` in pdftoppm's CLI)
 
 ## Performance tips
 
