@@ -28,15 +28,14 @@ from .exceptions import (
 TRANSPARENT_FILE_TYPES = ['png', 'tiff']
 
 
-def convert_from_path(pdf_path, dpi=200, poppler_path=None, output_folder=None, first_page=None, last_page=None,
+def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None,
                       fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                      output_file=str(uuid.uuid4())):
+                      output_file=str(uuid.uuid4()), poppler_path=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
             pdf_path -> Path to the PDF that you want to convert
             dpi -> Image quality in DPI (default 200)
-            poppler_path -> Path to look for poppler binaries
             output_folder -> Write the resulting images to a folder (instead of directly in memory)
             first_page -> First page to process
             last_page -> Last page to process before stopping
@@ -46,6 +45,9 @@ def convert_from_path(pdf_path, dpi=200, poppler_path=None, output_folder=None, 
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
+            output_file -> What is the output filename
+            poppler_path -> Path to look for poppler binaries
+
     """
 
     page_count = _page_count(pdf_path, userpw, poppler_path=poppler_path)
@@ -110,6 +112,7 @@ def convert_from_path(pdf_path, dpi=200, poppler_path=None, output_folder=None, 
         else:
             images += parse_buffer_func(data)
 
+    # Kill the poppler process for the cases where it still holding the files handle
     for uid, proc in processes:
         proc.kill()
 
@@ -119,7 +122,9 @@ def convert_from_path(pdf_path, dpi=200, poppler_path=None, output_folder=None, 
     return images
 
 
-def convert_from_bytes(pdf_file, dpi=200, poppler_path=None, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, output_file=str(uuid.uuid4())):
+def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None,
+                       fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
+                       output_file=str(uuid.uuid4()), poppler_path=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -135,6 +140,8 @@ def convert_from_bytes(pdf_file, dpi=200, poppler_path=None, output_folder=None,
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
+            output_file -> What is the output filename
+            poppler_path -> Path to look for poppler binaries
     """
 
     fh, temp_filename = tempfile.mkstemp()
@@ -191,8 +198,6 @@ def _parse_format(fmt):
 
 
 def _get_command_path(command, poppler_path=None):
-    command = command
-
     if platform.system() == 'Windows':
         command = command + '.exe'
 
