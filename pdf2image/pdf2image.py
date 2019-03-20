@@ -112,10 +112,6 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         else:
             images += parse_buffer_func(data)
 
-    # Kill the poppler process for the cases where it still holding the files handle
-    for uid, proc in processes:
-        proc.kill()
-
     if auto_temp_dir:
         shutil.rmtree(output_folder)
 
