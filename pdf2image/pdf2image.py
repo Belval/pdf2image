@@ -208,7 +208,7 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
         if userpw is not None:
-            command = command + [userpw]
+            command.extend(['-upw', userpw])
 
         proc = Popen(command, stdout=PIPE, stderr=PIPE)
 
