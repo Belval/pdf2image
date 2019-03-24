@@ -688,8 +688,9 @@ class PDFConversionMethods(unittest.TestCase):
         print('test_close_tempfile_after_conversion: {} sec'.format((time.time() - start_time)))
 
     ## Test poppler_path
-    
+
     @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     @unittest.skipIf(not os.name == 'posix', "This test only works on posix systems")
     def test_use_poppler_path(self):
         os.mkdir('./bin')
