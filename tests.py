@@ -705,5 +705,21 @@ class PDFConversionMethods(unittest.TestCase):
         [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_poppler_path: {} sec'.format((time.time() - start_time)))
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    @unittest.skipIf(not os.name == 'posix', "This test only works on posix systems")
+    def test_use_poppler_path_with_trailing_slash(self):
+        os.mkdir('./bin')
+        shutil.copy('/usr/bin/pdftoppm', './bin')
+        shutil.copy('/usr/bin/pdfinfo', './bin')
+        start_time = time.time()
+        try:
+            images_from_path = convert_from_path('./tests/test.pdf', poppler_path='./bin/')
+        finally:
+            shutil.rmtree('./bin')
+        self.assertTrue(len(images_from_path) == 1)
+        [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_poppler_path_with_trailing_slash: {} sec'.format((time.time() - start_time)))
+
 if __name__=='__main__':
     unittest.main()
