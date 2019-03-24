@@ -198,7 +198,7 @@ def _get_command_path(command, poppler_path=None):
         command = command + '.exe'
 
     if poppler_path is not None:
-        command = poppler_path + command
+        command = os.path.join(poppler_path, command)
 
     return command
 
