@@ -64,7 +64,7 @@ Here are the definitions:
 - Allow the user to specify poppler's installation path with `poppler_path`
 - Fixed a bug where PNGs buffer with a non-terminating I-E-N-D sequence would throw an exception   
 - Fixed a bug that left open file descriptors when using `convert_from_bytes()` (Thank you @FabianUken)
-- `fmt='tiff'` parameter allowss you to create .tiff files (You need pdftocairo for this)
+- `fmt='tiff'` parameter allows you to create .tiff files (You need pdftocairo for this)
 - `transparent` parameter allows you to generate images with no background instead of the usual white one (You need pdftocairo for this)
 - `strict` parameter allows you to catch pdftoppm syntax error with a custom type `PDFSyntaxError`
 - `use_cropbox` parameter allows you to use the crop box instead of the media box when converting (`-cropbox` in pdftoppm's CLI)
