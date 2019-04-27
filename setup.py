@@ -6,12 +6,17 @@ from os import path
 
 here = path.abspath(path.dirname(__file__))
 
+with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 setup(
     name='pdf2image',
 
-    version='1.5.1',
+    version='1.5.2',
 
     description='A wrapper around the pdftoppm and pdftocairo command line tools to convert PDF to a PIL Image list.',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
 
     url='https://github.com/Belval/pdf2image',
 
