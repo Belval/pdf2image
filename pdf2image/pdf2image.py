@@ -96,8 +96,12 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Update page values
         current_page = current_page + thread_page_count
         reminder -= int(reminder > 0)
+        # Add poppler path to LD_LIBRARY_PATH
+        env = os.environ.copy()
+        if poppler_path is not None:
+            env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
         # Spawn the process and save its uuid
-        processes.append((thread_output_file, Popen(args, stdout=PIPE, stderr=PIPE)))
+        processes.append((thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE)))
 
     images = []
 
@@ -210,7 +214,11 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         if userpw is not None:
             command.extend(['-upw', userpw])
 
-        proc = Popen(command, stdout=PIPE, stderr=PIPE)
+        # Add poppler path to LD_LIBRARY_PATH
+        env = os.environ.copy()
+        if poppler_path is not None:
+            env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
+        proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
 
         out, err = proc.communicate()
     except:
