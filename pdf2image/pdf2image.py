@@ -67,6 +67,9 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     if last_page is None or last_page > page_count:
         last_page = page_count
 
+    if first_page > last_page:
+        return []
+
     auto_temp_dir = False
     if output_folder is None and use_pdfcairo:
         auto_temp_dir = True
