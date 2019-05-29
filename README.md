@@ -7,11 +7,17 @@ A python 2.7 and 3.4+ module that wraps pdftoppm and pdftocairo to convert PDF t
 
 pdftoppm and pdftocairo are the piece of software that do the actual magic. It is distributed as part of a greater package called [poppler](https://poppler.freedesktop.org/).
 
+### Using `pip`
+
 Windows users will have to install [poppler for Windows](http://blog.alivate.com.au/poppler-windows/), then add the `bin/` folder to [PATH](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/).
 
 Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/).
 
 Linux users will have both tools pre-installed with Ubuntu 16.04+ and Archlinux. If it's not, run `sudo apt install poppler-utils`
+
+### Using `conda`
+
+`conda install -c conda-forge poppler`
 
 ### Then you can install the pip package!
 
