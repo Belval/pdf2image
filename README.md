@@ -81,7 +81,7 @@ Here are the definitions:
 - Using an output folder is significantly faster if you are using an SSD. Otherwise i/o usually becomes the bottleneck.
 - Using multiple threads can give you some gains but avoid more than 4 as this will cause i/o bottleneck (even on my NVMe SSD!).
 - If i/o is your bottleneck, using the JPEG format can lead to significant gains.
-- PNG format is pretty slow, I am investigating the issue.
+- PNG format is pretty slow, this is because of the compression.
 - If you want to know the best settings (most settings will be fine anyway) you can clone the project and run `python tests.py` to get timings.
 
 ## Limitations / known issues
