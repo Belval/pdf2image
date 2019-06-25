@@ -221,7 +221,7 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         env = os.environ.copy()
         if poppler_path is not None:
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
-        proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+        proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE, universal_newlines=True)
 
         out, err = proc.communicate()
     except:
@@ -229,10 +229,9 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
 
     try:
         # This will throw if we are unable to get page count
-        return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
+        return int(re.search(r'Pages:\s+(\d+)', out).group(1))
     except:
-        raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
-
+        raise PDFPageCountError('Unable to get page count. %s' % out)
 
 def _load_from_output_folder(output_folder, output_file, in_memory=False):
     images = []
