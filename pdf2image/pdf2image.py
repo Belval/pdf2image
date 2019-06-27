@@ -231,7 +231,7 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         # This will throw if we are unable to get page count
         return int(re.search(r'Pages:\s+(\d+)', out).group(1))
     except:
-        raise PDFPageCountError('Unable to get page count. %s' % out)
+        raise PDFPageCountError('Unable to get page count. %s' % err)
 
 def _load_from_output_folder(output_folder, output_file, in_memory=False):
     images = []
