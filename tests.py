@@ -785,7 +785,7 @@ class PDFConversionMethods(unittest.TestCase):
             shutil.copyfile('./tests/test.pdf', os.path.join(path, 'test.pdf'))
             images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, output_file='test')
             self.assertTrue(len(images_from_path) == 1)
-            self.assertTrue(images_from_path[0].filename == os.path.join(path, 'test.ppm'))
+            self.assertTrue(images_from_path[0].filename == os.path.join(path, 'test-1.ppm'))
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_single_file: {} sec'.format(time.time() - start_time))
 
