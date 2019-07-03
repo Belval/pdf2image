@@ -30,7 +30,7 @@ TRANSPARENT_FILE_TYPES = ['png', 'tiff']
 
 def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None,
                       fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                      output_file=str(uuid.uuid4()), poppler_path=None):
+                      single_file=False, output_file=str(uuid.uuid4()), poppler_path=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -45,6 +45,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
+            single_file -> Uses the -singlefile option from pdftoppm/pdftocairo
             output_file -> What is the output filename
             poppler_path -> Path to look for poppler binaries
 
@@ -89,7 +90,18 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
-        args = _build_command(['-r', str(dpi), pdf_path], output_folder, current_page, current_page + thread_page_count - 1, parsed_fmt, thread_output_file, userpw, use_cropbox, transparent)
+        args = _build_command(
+            ['-r', str(dpi), pdf_path],
+            output_folder,
+            current_page,
+            current_page + thread_page_count - 1,
+            parsed_fmt,
+            thread_output_file,
+            userpw,
+            use_cropbox,
+            transparent,
+            single_file
+        )
 
         if use_pdfcairo:
             args = [_get_command_path('pdftocairo', poppler_path)] + args
@@ -127,7 +139,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
 def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None,
                        fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                       output_file=str(uuid.uuid4()), poppler_path=None):
+                       single_file=False, output_file=str(uuid.uuid4()), poppler_path=None):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -143,6 +155,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
+            single_file -> Uses the -singlefile option from pdftoppm/pdftocairo
             output_file -> What is the output filename
             poppler_path -> Path to look for poppler binaries
     """
@@ -155,13 +168,13 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             return convert_from_path(f.name, dpi=dpi, output_folder=output_folder,
                                      first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count,
                                      userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent,
-                                     output_file=output_file, poppler_path=poppler_path)
+                                     single_file=single_file, output_file=output_file, poppler_path=poppler_path)
     finally:
         os.close(fh)
         os.remove(temp_filename)
 
 
-def _build_command(args, output_folder, first_page, last_page, fmt, output_file, userpw, use_cropbox, transparent):
+def _build_command(args, output_folder, first_page, last_page, fmt, output_file, userpw, use_cropbox, transparent, single_file):
     if use_cropbox:
         args.append('-cropbox')
 
@@ -176,6 +189,9 @@ def _build_command(args, output_folder, first_page, last_page, fmt, output_file,
 
     if fmt != 'ppm':
         args.append('-' + fmt)
+
+    if single_file:
+        args.append('-singlefile')
 
     if output_folder is not None:
         args.append(os.path.join(output_folder, output_file))
