@@ -739,5 +739,41 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(len(images_from_path) == 0)
         print('test_conversion_from_path_14: {} sec'.format((time.time() - start_time) / 14.))
 
+    ## Test singlefile
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_bytes_using_dir_single_file(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            with open('./tests/test.pdf', 'rb') as pdf_file:
+                images_from_bytes = convert_from_bytes(pdf_file.read(), output_folder=path, output_file='test', single_file=True)
+                self.assertTrue(len(images_from_bytes) == 1)
+                self.assertTrue(images_from_bytes[0].filename == os.path.join(path, 'test.ppm'))
+                [im.close() for im in images_from_bytes]
+        print('test_conversion_from_bytes_using_dir_single_file: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_dir_single_file(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, output_file='test', single_file=True)
+            self.assertTrue(len(images_from_path) == 1)
+            self.assertTrue(images_from_path[0].filename == os.path.join(path, 'test.ppm'))
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_single_file: {} sec'.format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_dir_14_single_file(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, output_file='test', single_file=True)
+            self.assertTrue(len(images_from_path) == 1)
+            self.assertTrue(images_from_path[0].filename == os.path.join(path, 'test.ppm'))
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_14_single_file: {} sec'.format((time.time() - start_time) / 14.))
+
 if __name__=='__main__':
     unittest.main()
