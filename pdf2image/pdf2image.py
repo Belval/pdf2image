@@ -54,7 +54,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     page_count = _page_count(pdf_path, userpw, poppler_path=poppler_path)
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
-    parsed_fmt, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt)
+    parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt)
 
     # We use pdftocairo is the format requires it OR we need a transparent output
     use_pdfcairo = use_pdfcairo_format or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
@@ -127,7 +127,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
         if output_folder is not None:
-            images += _load_from_output_folder(output_folder, uid, in_memory=auto_temp_dir)
+            images += _load_from_output_folder(output_folder, uid, final_extension, in_memory=auto_temp_dir)
         else:
             images += parse_buffer_func(data)
 
@@ -207,13 +207,13 @@ def _parse_format(fmt):
     if fmt[0] == '.':
         fmt = fmt[1:]
     if fmt in ('jpeg', 'jpg'):
-        return 'jpeg', parse_buffer_to_jpeg, False
+        return 'jpeg', 'jpg', parse_buffer_to_jpeg, False
     if fmt == 'png':
-        return 'png', parse_buffer_to_png, False
+        return 'png', 'png', parse_buffer_to_png, False
     if fmt in ('tif', 'tiff'):
-        return 'tiff', None, True
+        return 'tiff', 'tif', None, True
     # Unable to parse the format so we'll use the default
-    return 'ppm', parse_buffer_to_ppm, False
+    return 'ppm', 'ppm', parse_buffer_to_ppm, False
 
 
 def _get_command_path(command, poppler_path=None):
@@ -250,10 +250,10 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
 
 
-def _load_from_output_folder(output_folder, output_file, in_memory=False):
+def _load_from_output_folder(output_folder, output_file, ext, in_memory=False):
     images = []
     for f in sorted(os.listdir(output_folder)):
-        if output_file in f:
+        if f.startswith(output_file) and f.split('.')[-1] == ext:
             images.append(Image.open(os.path.join(output_folder, f)))
             if in_memory:
                 images[-1].load()

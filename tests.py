@@ -775,5 +775,19 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_14_single_file: {} sec'.format((time.time() - start_time) / 14.))
 
+    ## Test file with same name in directory
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_dir_with_containing_file_with_same_name(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            shutil.copyfile('./tests/test.pdf', os.path.join(path, 'test.pdf'))
+            images_from_path = convert_from_path('./tests/test.pdf', output_folder=path, output_file='test')
+            self.assertTrue(len(images_from_path) == 1)
+            self.assertTrue(images_from_path[0].filename == os.path.join(path, 'test.ppm'))
+            [im.close() for im in images_from_path]
+        print('test_conversion_from_path_using_dir_single_file: {} sec'.format(time.time() - start_time))
+
 if __name__=='__main__':
     unittest.main()
