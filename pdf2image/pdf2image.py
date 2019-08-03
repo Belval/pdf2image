@@ -145,7 +145,6 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
         Parameters:
             pdf_file -> Bytes representing the PDF file
             dpi -> Image quality in DPI
-            poppler_path -> Path to look for poppler binaries
             output_folder -> Write the resulting images to a folder (instead of directly in memory)
             first_page -> First page to process
             last_page -> Last page to process before stopping
