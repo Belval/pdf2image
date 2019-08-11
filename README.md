@@ -54,8 +54,8 @@ OR better yet
 import tempfile
 
 with tempfile.TemporaryDirectory() as path:
-     images_from_path = convert_from_path('/home/belval/example.pdf', output_folder=path)
-     # Do something here
+    images_from_path = convert_from_path('/home/belval/example.pdf', output_folder=path)
+    # Do something here
 ```
 
 `images` will be a list of PIL Image representing each page of the PDF document.
