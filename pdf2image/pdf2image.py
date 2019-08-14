@@ -30,7 +30,7 @@ TRANSPARENT_FILE_TYPES = ['png', 'tiff']
 
 def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None,
                       fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                      single_file=False, output_file=str(uuid.uuid4()), poppler_path=None):
+                      single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -100,7 +100,8 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             userpw,
             use_cropbox,
             transparent,
-            single_file
+            single_file,
+            grayscale,
         )
 
         if use_pdfcairo:
@@ -173,7 +174,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
         os.remove(temp_filename)
 
 
-def _build_command(args, output_folder, first_page, last_page, fmt, output_file, userpw, use_cropbox, transparent, single_file):
+def _build_command(args, output_folder, first_page, last_page, fmt, output_file, userpw, use_cropbox, transparent, single_file, grayscale):
     if use_cropbox:
         args.append('-cropbox')
 
@@ -197,6 +198,9 @@ def _build_command(args, output_folder, first_page, last_page, fmt, output_file,
 
     if userpw is not None:
         args.extend(['-upw', userpw])
+    
+    if grayscale:
+        args.append('-gray')
 
     return args
 
