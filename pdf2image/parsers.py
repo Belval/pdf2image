@@ -7,8 +7,7 @@ from io import BytesIO
 from PIL import Image
 
 def parse_buffer_to_ppm(data):
-    """
-        Parse PPM file bytes to Pillow Image
+    """Parse PPM file bytes to Pillow Image
     """
 
     images = []
@@ -24,9 +23,25 @@ def parse_buffer_to_ppm(data):
 
     return images
 
-def parse_buffer_to_jpeg(data):
+def parse_buffer_to_pgm(data):
+    """Parse PGM file bytes to Pillow Image
     """
-        Parse JPEG file bytes to Pillow Image
+
+    images = []
+
+    index = 0
+
+    while index < len(data):
+        code, size, maxval = tuple(data[index:index + 40].split(b'\n')[0:3])
+        size_x, size_y = tuple(size.split(b' '))
+        file_size = len(code) + len(size) + len(maxval) + 3 + int(size_x) * int(size_y)
+        images.append(Image.open(BytesIO(data[index:index + file_size])))
+        index += file_size
+
+    return images
+
+def parse_buffer_to_jpeg(data):
+    """Parse JPEG file bytes to Pillow Image
     """
 
     return [
@@ -35,8 +50,7 @@ def parse_buffer_to_jpeg(data):
     ]
 
 def parse_buffer_to_png(data):
-    """
-        Parse PNG file bytes to Pillow Image
+    """Parse PNG file bytes to Pillow Image
     """
 
     images = []

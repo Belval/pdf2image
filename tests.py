@@ -789,5 +789,37 @@ class PDFConversionMethods(unittest.TestCase):
             [im.close() for im in images_from_path]
         print('test_conversion_from_path_using_dir_single_file: {} sec'.format(time.time() - start_time))
 
+    ## Test grayscale option
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_grayscale_from_bytes(self):
+        start_time = time.time()
+        with open('./tests/test_14.pdf', 'rb') as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), grayscale=True)
+            self.assertTrue(images_from_bytes[0].mode == 'L')
+        print('test_conversion_to_grayscale_from_bytes_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_grayscale_from_path(self):
+        start_time = time.time()
+        images_from_path = convert_from_path('./tests/test_14.pdf', grayscale=True)
+        self.assertTrue(images_from_path[0].mode == 'L')
+        [im.close() for im in images_from_path]
+        print('test_conversion_to_grayscale_from_path_14: {} sec'.format((time.time() - start_time) / 14.))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_grayscale_from_path_using_dir(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path('./tests/test_14.pdf', output_folder=path, grayscale=True)
+            self.assertTrue(images_from_path[0].mode == 'L')
+            images_from_path[0].save('blah.jpg')
+            [im.close() for im in images_from_path]
+        print('test_conversion_to_grayscale_from_path_using_dir_14: {} sec'.format((time.time() - start_time) / 14.))
+
+
 if __name__=='__main__':
     unittest.main()

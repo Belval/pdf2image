@@ -14,6 +14,7 @@ from subprocess import Popen, PIPE
 from PIL import Image
 
 from .parsers import (
+    parse_buffer_to_pgm,
     parse_buffer_to_ppm,
     parse_buffer_to_jpeg,
     parse_buffer_to_png
@@ -48,13 +49,13 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
             single_file -> Uses the -singlefile option from pdftoppm/pdftocairo
             output_file -> What is the output filename
             poppler_path -> Path to look for poppler binaries
-
+            grayscale -> Output grayscale image(s)
     """
 
     page_count = _page_count(pdf_path, userpw, poppler_path=poppler_path)
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
-    parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt)
+    parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt, grayscale)
 
     # We use pdftocairo is the format requires it OR we need a transparent output
     use_pdfcairo = use_pdfcairo_format or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
@@ -140,7 +141,7 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
 
 def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None,
                        fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                       single_file=False, output_file=str(uuid.uuid4()), poppler_path=None):
+                       single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -158,6 +159,7 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             single_file -> Uses the -singlefile option from pdftoppm/pdftocairo
             output_file -> What is the output filename
             poppler_path -> Path to look for poppler binaries
+            grayscale -> Output grayscale image(s)
     """
 
     fh, temp_filename = tempfile.mkstemp()
@@ -168,7 +170,8 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
             return convert_from_path(f.name, dpi=dpi, output_folder=output_folder,
                                      first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count,
                                      userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent,
-                                     single_file=single_file, output_file=output_file, poppler_path=poppler_path)
+                                     single_file=single_file, output_file=output_file, poppler_path=poppler_path,
+                                     grayscale=grayscale)
     finally:
         os.close(fh)
         os.remove(temp_filename)
@@ -187,7 +190,7 @@ def _build_command(args, output_folder, first_page, last_page, fmt, output_file,
     if last_page is not None:
         args.extend(['-l', str(last_page)])
 
-    if fmt != 'ppm':
+    if fmt not in ['pgm', 'ppm']:
         args.append('-' + fmt)
 
     if single_file:
@@ -205,7 +208,7 @@ def _build_command(args, output_folder, first_page, last_page, fmt, output_file,
     return args
 
 
-def _parse_format(fmt):
+def _parse_format(fmt, grayscale=False):
     fmt = fmt.lower()
     if fmt[0] == '.':
         fmt = fmt[1:]
@@ -215,6 +218,8 @@ def _parse_format(fmt):
         return 'png', 'png', parse_buffer_to_png, False
     if fmt in ('tif', 'tiff'):
         return 'tiff', 'tif', None, True
+    if fmt == 'ppm' and grayscale:
+        return 'pgm', 'pgm', parse_buffer_to_pgm, False
     # Unable to parse the format so we'll use the default
     return 'ppm', 'ppm', parse_buffer_to_ppm, False
 
