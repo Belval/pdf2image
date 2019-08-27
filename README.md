@@ -63,14 +63,15 @@ with tempfile.TemporaryDirectory() as path:
 Here are the definitions:
 
 `
-convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None)
+convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False)
 `
 
 `
-convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None)
+convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False)
 `
 
 ## What's new?
+- `grayscale` parameter allows you to convert images to grayscale (`-gray` in pdftoppm CLI)
 - `single_file` parameter allows you to convert the first PDF page only, without adding digits at the end of the `output_file` 
 - Allow the user to specify poppler's installation path with `poppler_path`
 - Fixed a bug where PNGs buffer with a non-terminating I-E-N-D sequence would throw an exception   
@@ -78,7 +79,6 @@ convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_
 - `fmt='tiff'` parameter allows you to create .tiff files (You need pdftocairo for this)
 - `transparent` parameter allows you to generate images with no background instead of the usual white one (You need pdftocairo for this)
 - `strict` parameter allows you to catch pdftoppm syntax error with a custom type `PDFSyntaxError`
-- `use_cropbox` parameter allows you to use the crop box instead of the media box when converting (`-cropbox` in pdftoppm's CLI)
 
 ## Performance tips
 
