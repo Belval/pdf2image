@@ -17,21 +17,31 @@ from .parsers import (
     parse_buffer_to_pgm,
     parse_buffer_to_ppm,
     parse_buffer_to_jpeg,
-    parse_buffer_to_png
+    parse_buffer_to_png,
 )
 
-from .exceptions import (
-    PDFInfoNotInstalledError,
-    PDFPageCountError,
-    PDFSyntaxError
-)
+from .exceptions import PDFInfoNotInstalledError, PDFPageCountError, PDFSyntaxError
 
-TRANSPARENT_FILE_TYPES = ['png', 'tiff']
+TRANSPARENT_FILE_TYPES = ["png", "tiff"]
 
 
-def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None,
-                      fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                      single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False):
+def convert_from_path(
+    pdf_path,
+    dpi=200,
+    output_folder=None,
+    first_page=None,
+    last_page=None,
+    fmt="ppm",
+    thread_count=1,
+    userpw=None,
+    use_cropbox=False,
+    strict=False,
+    transparent=False,
+    single_file=False,
+    output_file=str(uuid.uuid4()),
+    poppler_path=None,
+    grayscale=False,
+):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -55,10 +65,14 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     page_count = _page_count(pdf_path, userpw, poppler_path=poppler_path)
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
-    parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(fmt, grayscale)
+    parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
+        fmt, grayscale
+    )
 
     # We use pdftocairo is the format requires it OR we need a transparent output
-    use_pdfcairo = use_pdfcairo_format or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
+    use_pdfcairo = use_pdfcairo_format or (
+        transparent and parsed_fmt in TRANSPARENT_FILE_TYPES
+    )
 
     if thread_count < 1:
         thread_count = 1
@@ -87,12 +101,14 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     current_page = first_page
     processes = []
     for i in range(thread_count):
-        thread_output_file = output_file + '_' + str(i) if thread_count > 1 else output_file 
+        thread_output_file = (
+            output_file + "_" + str(i) if thread_count > 1 else output_file
+        )
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
         args = _build_command(
-            ['-r', str(dpi), pdf_path],
+            ["-r", str(dpi), pdf_path],
             output_folder,
             current_page,
             current_page + thread_page_count - 1,
@@ -106,9 +122,9 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         )
 
         if use_pdfcairo:
-            args = [_get_command_path('pdftocairo', poppler_path)] + args
+            args = [_get_command_path("pdftocairo", poppler_path)] + args
         else:
-            args = [_get_command_path('pdftoppm', poppler_path)] + args
+            args = [_get_command_path("pdftoppm", poppler_path)] + args
 
         # Update page values
         current_page = current_page + thread_page_count
@@ -118,18 +134,22 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
         if poppler_path is not None:
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
         # Spawn the process and save its uuid
-        processes.append((thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE)))
+        processes.append(
+            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE))
+        )
 
     images = []
 
     for uid, proc in processes:
         data, err = proc.communicate()
 
-        if b'Syntax Error'in err and strict:
+        if b"Syntax Error" in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
         if output_folder is not None:
-            images += _load_from_output_folder(output_folder, uid, final_extension, in_memory=auto_temp_dir)
+            images += _load_from_output_folder(
+                output_folder, uid, final_extension, in_memory=auto_temp_dir
+            )
         else:
             images += parse_buffer_func(data)
 
@@ -139,9 +159,23 @@ def convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, la
     return images
 
 
-def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None,
-                       fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False,
-                       single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False):
+def convert_from_bytes(
+    pdf_file,
+    dpi=200,
+    output_folder=None,
+    first_page=None,
+    last_page=None,
+    fmt="ppm",
+    thread_count=1,
+    userpw=None,
+    use_cropbox=False,
+    strict=False,
+    transparent=False,
+    single_file=False,
+    output_file=str(uuid.uuid4()),
+    poppler_path=None,
+    grayscale=False,
+):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -164,69 +198,93 @@ def convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, l
 
     fh, temp_filename = tempfile.mkstemp()
     try:
-        with open(temp_filename, 'wb') as f:
+        with open(temp_filename, "wb") as f:
             f.write(pdf_file)
             f.flush()
-            return convert_from_path(f.name, dpi=dpi, output_folder=output_folder,
-                                     first_page=first_page, last_page=last_page, fmt=fmt, thread_count=thread_count,
-                                     userpw=userpw, use_cropbox=use_cropbox, strict=strict, transparent=transparent,
-                                     single_file=single_file, output_file=output_file, poppler_path=poppler_path,
-                                     grayscale=grayscale)
+            return convert_from_path(
+                f.name,
+                dpi=dpi,
+                output_folder=output_folder,
+                first_page=first_page,
+                last_page=last_page,
+                fmt=fmt,
+                thread_count=thread_count,
+                userpw=userpw,
+                use_cropbox=use_cropbox,
+                strict=strict,
+                transparent=transparent,
+                single_file=single_file,
+                output_file=output_file,
+                poppler_path=poppler_path,
+                grayscale=grayscale,
+            )
     finally:
         os.close(fh)
         os.remove(temp_filename)
 
 
-def _build_command(args, output_folder, first_page, last_page, fmt, output_file, userpw, use_cropbox, transparent, single_file, grayscale):
+def _build_command(
+    args,
+    output_folder,
+    first_page,
+    last_page,
+    fmt,
+    output_file,
+    userpw,
+    use_cropbox,
+    transparent,
+    single_file,
+    grayscale,
+):
     if use_cropbox:
-        args.append('-cropbox')
+        args.append("-cropbox")
 
     if transparent and fmt in TRANSPARENT_FILE_TYPES:
-        args.append('-transp')
+        args.append("-transp")
 
     if first_page is not None:
-        args.extend(['-f', str(first_page)])
+        args.extend(["-f", str(first_page)])
 
     if last_page is not None:
-        args.extend(['-l', str(last_page)])
+        args.extend(["-l", str(last_page)])
 
-    if fmt not in ['pgm', 'ppm']:
-        args.append('-' + fmt)
+    if fmt not in ["pgm", "ppm"]:
+        args.append("-" + fmt)
 
     if single_file:
-        args.append('-singlefile')
+        args.append("-singlefile")
 
     if output_folder is not None:
         args.append(os.path.join(output_folder, output_file))
 
     if userpw is not None:
-        args.extend(['-upw', userpw])
-    
+        args.extend(["-upw", userpw])
+
     if grayscale:
-        args.append('-gray')
+        args.append("-gray")
 
     return args
 
 
 def _parse_format(fmt, grayscale=False):
     fmt = fmt.lower()
-    if fmt[0] == '.':
+    if fmt[0] == ".":
         fmt = fmt[1:]
-    if fmt in ('jpeg', 'jpg'):
-        return 'jpeg', 'jpg', parse_buffer_to_jpeg, False
-    if fmt == 'png':
-        return 'png', 'png', parse_buffer_to_png, False
-    if fmt in ('tif', 'tiff'):
-        return 'tiff', 'tif', None, True
-    if fmt == 'ppm' and grayscale:
-        return 'pgm', 'pgm', parse_buffer_to_pgm, False
+    if fmt in ("jpeg", "jpg"):
+        return "jpeg", "jpg", parse_buffer_to_jpeg, False
+    if fmt == "png":
+        return "png", "png", parse_buffer_to_png, False
+    if fmt in ("tif", "tiff"):
+        return "tiff", "tif", None, True
+    if fmt == "ppm" and grayscale:
+        return "pgm", "pgm", parse_buffer_to_pgm, False
     # Unable to parse the format so we'll use the default
-    return 'ppm', 'ppm', parse_buffer_to_ppm, False
+    return "ppm", "ppm", parse_buffer_to_ppm, False
 
 
 def _get_command_path(command, poppler_path=None):
-    if platform.system() == 'Windows':
-        command = command + '.exe'
+    if platform.system() == "Windows":
+        command = command + ".exe"
 
     if poppler_path is not None:
         command = os.path.join(poppler_path, command)
@@ -239,7 +297,7 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
         if userpw is not None:
-            command.extend(['-upw', userpw])
+            command.extend(["-upw", userpw])
 
         # Add poppler path to LD_LIBRARY_PATH
         env = os.environ.copy()
@@ -249,19 +307,23 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
 
         out, err = proc.communicate()
     except:
-        raise PDFInfoNotInstalledError('Unable to get page count. Is poppler installed and in PATH?')
+        raise PDFInfoNotInstalledError(
+            "Unable to get page count. Is poppler installed and in PATH?"
+        )
 
     try:
         # This will throw if we are unable to get page count
-        return int(re.search(r'Pages:\s+(\d+)', out.decode("utf8", "ignore")).group(1))
+        return int(re.search(r"Pages:\s+(\d+)", out.decode("utf8", "ignore")).group(1))
     except:
-        raise PDFPageCountError('Unable to get page count. %s' % err.decode("utf8", "ignore"))
+        raise PDFPageCountError(
+            "Unable to get page count. %s" % err.decode("utf8", "ignore")
+        )
 
 
 def _load_from_output_folder(output_folder, output_file, ext, in_memory=False):
     images = []
     for f in sorted(os.listdir(output_folder)):
-        if f.startswith(output_file) and f.split('.')[-1] == ext:
+        if f.startswith(output_file) and f.split(".")[-1] == ext:
             images.append(Image.open(os.path.join(output_folder, f)))
             if in_memory:
                 images[-1].load()
