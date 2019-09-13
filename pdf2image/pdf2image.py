@@ -6,12 +6,14 @@
 import os
 import platform
 import re
-import uuid
 import tempfile
+import types
 import shutil
 
 from subprocess import Popen, PIPE
 from PIL import Image
+
+from .generators import uuid_generator, counter_generator
 
 from .parsers import (
     parse_buffer_to_pgm,
@@ -38,7 +40,7 @@ def convert_from_path(
     strict=False,
     transparent=False,
     single_file=False,
-    output_file=str(uuid.uuid4()),
+    output_file=uuid_generator(),
     poppler_path=None,
     grayscale=False,
 ):
@@ -57,7 +59,7 @@ def convert_from_path(
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
             single_file -> Uses the -singlefile option from pdftoppm/pdftocairo
-            output_file -> What is the output filename
+            output_file -> What is the output filename or generator
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
     """
@@ -73,6 +75,13 @@ def convert_from_path(
     use_pdfcairo = use_pdfcairo_format or (
         transparent and parsed_fmt in TRANSPARENT_FILE_TYPES
     )
+
+    # If output_file isn't a generator, it will be turned into one
+    if not isinstance(output_file, types.GeneratorType):
+        if single_file:
+            output_file = iter([output_file])
+        else:
+            output_file = counter_generator(output_file)
 
     if thread_count < 1:
         thread_count = 1
@@ -100,10 +109,9 @@ def convert_from_path(
     reminder = page_count % thread_count
     current_page = first_page
     processes = []
-    for i in range(thread_count):
-        thread_output_file = (
-            output_file + "_" + str(i) if thread_count > 1 else output_file
-        )
+    for _ in range(thread_count):
+        thread_output_file = next(output_file)
+
         # Get the number of pages the thread will be processing
         thread_page_count = page_count // thread_count + int(reminder > 0)
         # Build the command accordingly
@@ -172,7 +180,7 @@ def convert_from_bytes(
     strict=False,
     transparent=False,
     single_file=False,
-    output_file=str(uuid.uuid4()),
+    output_file=uuid_generator(),
     poppler_path=None,
     grayscale=False,
 ):
@@ -191,7 +199,7 @@ def convert_from_bytes(
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
             single_file -> Uses the -singlefile option from pdftoppm/pdftocairo
-            output_file -> What is the output filename
+            output_file -> What is the output filename or generator
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
     """
