@@ -1,5 +1,6 @@
 import os
 import sys
+import errno
 import tempfile
 import unittest
 import time
@@ -43,7 +44,7 @@ try:
     )
     POPPLER_INSTALLED = True
 except OSError as e:
-    if e.errno == os.errno.ENOENT:
+    if e.errno == errno.ENOENT:
         POPPLER_INSTALLED = False
 
 
