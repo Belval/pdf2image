@@ -207,16 +207,6 @@ def convert_from_bytes(
             grayscale -> Output grayscale image(s)
     """
 
-    # We make sure that if passed arguments are Path objects, they're converted to strings
-    if isinstance(pdf_file, pathlib.PurePath):
-        pdf_file = pdf_file.as_posix()
-
-    if isinstance(output_folder, pathlib.PurePath):
-        output_folder = output_folder.as_posix()
-
-    if isinstance(poppler_path, pathlib.PurePath):
-        poppler_path = poppler_path.as_posix()
-
     fh, temp_filename = tempfile.mkstemp()
     try:
         with open(temp_filename, "wb") as f:
