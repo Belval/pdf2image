@@ -6,22 +6,7 @@ import unittest
 import time
 import subprocess
 import shutil
-
-# polyfill for python27
-try:
-    from tempfile import TemporaryDirectory
-except ImportError:
-
-    class TemporaryDirectory(object):
-        def __init__(self):
-            self.name = tempfile.mkdtemp()
-
-        def __enter__(self):
-            return self.name
-
-        def __exit__(self, exc, value, tb):
-            shutil.rmtree(self.name)
-
+from tempfile import TemporaryDirectory
 
 from memory_profiler import profile as profile_memory
 
