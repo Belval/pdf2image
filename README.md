@@ -1,5 +1,6 @@
 # pdf2image [![TravisCI](https://travis-ci.org/Belval/pdf2image.svg?branch=master)](https://travis-ci.org/Belval/pdf2image) [![PyPI version](https://badge.fury.io/py/pdf2image.svg)](https://badge.fury.io/py/pdf2image) [![codecov](https://codecov.io/gh/Belval/pdf2image/branch/master/graph/badge.svg)](https://codecov.io/gh/Belval/pdf2image) [![Downloads](https://pepy.tech/badge/pdf2image/month)](https://pepy.tech/project/pdf2image) [![mattermost](https://img.shields.io/badge/help-mattermost-blue)](https://mattermost.belval.org/signup_user_complete/?id=3anaj34563rqjg4xm5tdcmu7qa)
-A python 2.7 and 3.5+ module that wraps pdftoppm and pdftocairo to convert PDF to a PIL Image object
+
+A python (3.5+) module that wraps pdftoppm and pdftocairo to convert PDF to a PIL Image object
 
 ## How to install
 
