@@ -9,6 +9,7 @@ import re
 import tempfile
 import types
 import shutil
+import pathlib
 
 from subprocess import Popen, PIPE
 from PIL import Image
@@ -63,6 +64,16 @@ def convert_from_path(
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
     """
+
+    # We make sure that if passed arguments are Path objects, they're converted to strings
+    if isinstance(pdf_path, pathlib.PurePath):
+        pdf_path = pdf_path.as_posix()
+
+    if isinstance(output_folder, pathlib.PurePath):
+        output_folder = output_folder.as_posix()
+
+    if isinstance(poppler_path, pathlib.PurePath):
+        poppler_path = poppler_path.as_posix()
 
     page_count = _page_count(pdf_path, userpw, poppler_path=poppler_path)
 
