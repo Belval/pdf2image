@@ -5,8 +5,9 @@ import pathlib
 import tempfile
 import unittest
 import time
-import subprocess
 import shutil
+import subprocess
+from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 
 from memory_profiler import profile as profile_memory
@@ -52,6 +53,12 @@ def profile(f):
             return r
 
         return wrapped
+
+
+def get_poppler_path():
+    return pathlib.Path(
+        Popen(["which", "pdftoppm"], stdout=PIPE).communicate()[0].strip().decode()
+    ).parent
 
 
 class PDFConversionMethods(unittest.TestCase):
@@ -1222,7 +1229,9 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with TemporaryDirectory() as path:
             images_from_path = convert_from_path(
-                pathlib.Path("./tests/test.pdf"), output_folder=path
+                pathlib.Path("./tests/test.pdf"),
+                output_folder=pathlib.Path(path),
+                poppler_path=get_poppler_path(),
             )
             self.assertTrue(len(images_from_path) == 1)
             [im.close() for im in images_from_path]
@@ -1250,7 +1259,9 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with TemporaryDirectory() as path:
             images_from_path = convert_from_path(
-                pathlib.Path("./tests/test_14.pdf"), output_folder=path
+                pathlib.Path("./tests/test_14.pdf"),
+                output_folder=pathlib.Path(path),
+                poppler_path=get_poppler_path(),
             )
             self.assertTrue(len(images_from_path) == 14)
             [im.close() for im in images_from_path]
