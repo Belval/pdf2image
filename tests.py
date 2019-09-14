@@ -514,6 +514,7 @@ class PDFConversionMethods(unittest.TestCase):
             "./tests/test.pdf", output_folder="./tests/"
         )
         self.assertTrue(len(images_from_path) == 1)
+        [im.close() for im in images_from_path]
         [os.remove(im.filename) for im in images_from_path]
         print(
             "test_non_empty_output_folder: {} sec".format(
@@ -1159,7 +1160,7 @@ class PDFConversionMethods(unittest.TestCase):
             )
             self.assertTrue(len(images_from_path) == 1)
             self.assertTrue(
-                images_from_path[0].filename == os.path.join(path, "test-1.ppm")
+                images_from_path[0].filename == os.path.join(path, "test0001-1.ppm")
             )
             [im.close() for im in images_from_path]
         print(
