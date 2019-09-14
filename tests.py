@@ -1,11 +1,13 @@
 import os
 import sys
 import errno
+import pathlib
 import tempfile
 import unittest
 import time
-import subprocess
 import shutil
+import subprocess
+from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 
 from memory_profiler import profile as profile_memory
@@ -51,6 +53,12 @@ def profile(f):
             return r
 
         return wrapped
+
+
+def get_poppler_path():
+    return pathlib.Path(
+        Popen(["which", "pdftoppm"], stdout=PIPE).communicate()[0].strip().decode()
+    ).parent
 
 
 class PDFConversionMethods(unittest.TestCase):
@@ -1206,10 +1214,59 @@ class PDFConversionMethods(unittest.TestCase):
                 "./tests/test_14.pdf", output_folder=path, grayscale=True
             )
             self.assertTrue(images_from_path[0].mode == "L")
-            images_from_path[0].save("blah.jpg")
             [im.close() for im in images_from_path]
         print(
             "test_conversion_to_grayscale_from_path_using_dir_14: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
+    ## Test pathlib support
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_pathlib_path_using_dir(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path(
+                pathlib.Path("./tests/test.pdf"),
+                output_folder=pathlib.Path(path),
+                poppler_path=get_poppler_path(),
+            )
+            self.assertTrue(len(images_from_path) == 1)
+            [im.close() for im in images_from_path]
+        print(
+            "test_conversion_from_pathlib_path_using_dir: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_pathlib_path_14(self):
+        start_time = time.time()
+        images_from_path = convert_from_path(pathlib.Path("./tests/test_14.pdf"))
+        self.assertTrue(len(images_from_path) == 14)
+        print(
+            "test_conversion_from_pathlib_path_14: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_pathlib_path_using_dir_14(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path(
+                pathlib.Path("./tests/test_14.pdf"),
+                output_folder=pathlib.Path(path),
+                poppler_path=get_poppler_path(),
+            )
+            self.assertTrue(len(images_from_path) == 14)
+            [im.close() for im in images_from_path]
+        print(
+            "test_conversion_from_pathlib_path_using_dir_14: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
