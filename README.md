@@ -71,6 +71,10 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 
 ## What's new?
 
+- `size` parameter allows you to define the shape of the resulting images (`-scale-to` in pdftoppm CLI)
+    - `size=400` will fit the image to a 400x400 box, preserving aspect ratio
+    - `size=(400, None)` will make the image 400 pixels wide, preserving aspect ratio
+    - `size=(500, 500)` will resize the image to 500x500 pixels, not preserving aspect ratio
 - `grayscale` parameter allows you to convert images to grayscale (`-gray` in pdftoppm CLI)
 - `single_file` parameter allows you to convert the first PDF page only, without adding digits at the end of the `output_file`
 - Allow the user to specify poppler's installation path with `poppler_path`
@@ -78,7 +82,6 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 - Fixed a bug that left open file descriptors when using `convert_from_bytes()` (Thank you @FabianUken)
 - `fmt='tiff'` parameter allows you to create .tiff files (You need pdftocairo for this)
 - `transparent` parameter allows you to generate images with no background instead of the usual white one (You need pdftocairo for this)
-- `strict` parameter allows you to catch pdftoppm syntax error with a custom type `PDFSyntaxError`
 
 ## Performance tips
 
