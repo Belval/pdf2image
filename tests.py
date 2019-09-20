@@ -1311,5 +1311,25 @@ class PDFConversionMethods(unittest.TestCase):
             pass
         print("test_conversion_from_path_with_invalid_size: {} sec".format(time.time() - start_time))
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_2d_tuple_size_with_None_width(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test.pdf", size=(None, 400))
+        self.assertTrue(images_from_path[0].size != 400)
+        self.assertTrue(images_from_path[1].size == 400)
+        self.assertTrue(len(images_from_path) == 1)
+        print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_2d_tuple_size_with_None_height(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test.pdf", size=(400, None))
+        self.assertTrue(images_from_path[0].size == 400)
+        self.assertTrue(images_from_path[1].size != 400)
+        self.assertTrue(len(images_from_path) == 1)
+        print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
+
 if __name__ == "__main__":
     unittest.main()
