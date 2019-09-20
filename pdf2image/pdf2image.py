@@ -298,7 +298,6 @@ def _build_command(
     else:
         raise ValueError("Size {} is not a tuple or an integer")
 
-
     return args
 
 
