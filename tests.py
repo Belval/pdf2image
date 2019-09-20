@@ -1296,7 +1296,6 @@ class PDFConversionMethods(unittest.TestCase):
     def test_conversion_from_path_with_2d_tuple_size(self):
         start_time = time.time()
         images_from_path = convert_from_path("./tests/test.pdf", size=(400, 400))
-        print(images_from_path[0].size)
         self.assertTrue(images_from_path[0].size == (400, 400))
         self.assertTrue(len(images_from_path) == 1)
         print("test_conversion_from_path_with_2d_tuple_size: {} sec".format(time.time() - start_time))
