@@ -44,6 +44,7 @@ def convert_from_path(
     output_file=uuid_generator(),
     poppler_path=None,
     grayscale=False,
+    size=None,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -138,6 +139,7 @@ def convert_from_path(
             transparent,
             single_file,
             grayscale,
+            size,
         )
 
         if use_pdfcairo:
@@ -194,6 +196,7 @@ def convert_from_bytes(
     output_file=uuid_generator(),
     poppler_path=None,
     grayscale=False,
+    size=None,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -236,6 +239,7 @@ def convert_from_bytes(
                 output_file=output_file,
                 poppler_path=poppler_path,
                 grayscale=grayscale,
+                size=size,
             )
     finally:
         os.close(fh)
@@ -254,6 +258,7 @@ def _build_command(
     transparent,
     single_file,
     grayscale,
+    size,
 ):
     if use_cropbox:
         args.append("-cropbox")
@@ -281,6 +286,17 @@ def _build_command(
 
     if grayscale:
         args.append("-gray")
+
+    if size is None:
+        pass
+    elif isinstance(size, tuple) and len(size) == 2:
+        args.extend(["-scale-to-x", str(int(size[0])), "-scale-to-y", str(int(size[1]))])
+    elif isinstance(size, tuple) and len(size) == 1:
+        args.extend(["-scale-to", str(int(size[0]))])
+    elif isinstance(size, int) or isinstance(size, float):
+        args.extend(["-scale-to", str(int(size))])
+    else:
+        raise ValueError("Size {} is not a tuple or an integer")
 
     return args
 

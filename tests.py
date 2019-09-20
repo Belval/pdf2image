@@ -1271,6 +1271,45 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    ## Test size parameter
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_int_size(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test.pdf", size=400)
+        self.assertTrue(images_from_path[0].size[1] == 400)
+        self.assertTrue(len(images_from_path) == 1)
+        print("test_conversion_from_path_with_int_size: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_1d_tuple_size(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test.pdf", size=(400,))
+        self.assertTrue(images_from_path[0].size[1] == 400)
+        self.assertTrue(len(images_from_path) == 1)
+        print("test_conversion_from_path_with_1d_tuple_size: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_2d_tuple_size(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test.pdf", size=(400, 400))
+        self.assertTrue(images_from_path[0].size == (400, 400))
+        self.assertTrue(len(images_from_path) == 1)
+        print("test_conversion_from_path_with_2d_tuple_size: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_invalid_size(self):
+        start_time = time.time()
+        try:
+            images_from_path = convert_from_path("./tests/test.pdf", size='bad value')
+            raise Exception("This should not happen")
+        except ValueError:
+            pass
+        print("test_conversion_from_path_with_invalid_size: {} sec".format(time.time() - start_time))
 
 if __name__ == "__main__":
     unittest.main()
