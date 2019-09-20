@@ -292,8 +292,12 @@ def _build_command(
     elif isinstance(size, tuple) and len(size) == 2:
         if size[0] is not None:
             args.extend(["-scale-to-x", str(int(size[0]))])
+        else:
+            args.extend(["-scale-to-x", str(-1)])
         if size[1] is not None:
             args.extend(["-scale-to-y", str(int(size[1]))])
+        else:
+            args.extend(["-scale-to-y", str(-1)])
     elif isinstance(size, tuple) and len(size) == 1:
         args.extend(["-scale-to", str(int(size[0]))])
     elif isinstance(size, int) or isinstance(size, float):

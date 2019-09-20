@@ -1317,7 +1317,7 @@ class PDFConversionMethods(unittest.TestCase):
     def test_conversion_from_path_with_2d_tuple_size_with_None_width(self):
         start_time = time.time()
         images_from_path = convert_from_path("./tests/test.pdf", size=(None, 400))
-        self.assertTrue(images_from_path[0].size[0] != 400)
+        self.assertTrue(images_from_path[0].size[0] == 310)
         self.assertTrue(images_from_path[0].size[1] == 400)
         self.assertTrue(len(images_from_path) == 1)
         print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
@@ -1328,7 +1328,7 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         images_from_path = convert_from_path("./tests/test.pdf", size=(400, None))
         self.assertTrue(images_from_path[0].size[0] == 400)
-        self.assertTrue(images_from_path[0].size[1] != 400)
+        self.assertTrue(images_from_path[0].size[1] == 518)
         self.assertTrue(len(images_from_path) == 1)
         print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
 
