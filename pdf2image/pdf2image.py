@@ -64,6 +64,7 @@ def convert_from_path(
             output_file -> What is the output filename or generator
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
+            size -> Size of the resulting image(s), uses the Pillow (width, height) standard
     """
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
@@ -216,6 +217,7 @@ def convert_from_bytes(
             output_file -> What is the output filename or generator
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
+            size -> Size of the resulting image(s), uses the Pillow (width, height) standard
     """
 
     fh, temp_filename = tempfile.mkstemp()
