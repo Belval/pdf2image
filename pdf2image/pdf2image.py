@@ -64,6 +64,7 @@ def convert_from_path(
             output_file -> What is the output filename or generator
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
+            size -> Size of the resulting image(s), uses the Pillow (width, height) standard
     """
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
@@ -216,6 +217,7 @@ def convert_from_bytes(
             output_file -> What is the output filename or generator
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
+            size -> Size of the resulting image(s), uses the Pillow (width, height) standard
     """
 
     fh, temp_filename = tempfile.mkstemp()
@@ -290,7 +292,14 @@ def _build_command(
     if size is None:
         pass
     elif isinstance(size, tuple) and len(size) == 2:
-        args.extend(["-scale-to-x", str(int(size[0])), "-scale-to-y", str(int(size[1]))])
+        if size[0] is not None:
+            args.extend(["-scale-to-x", str(int(size[0]))])
+        else:
+            args.extend(["-scale-to-x", str(-1)])
+        if size[1] is not None:
+            args.extend(["-scale-to-y", str(int(size[1]))])
+        else:
+            args.extend(["-scale-to-y", str(-1)])
     elif isinstance(size, tuple) and len(size) == 1:
         args.extend(["-scale-to", str(int(size[0]))])
     elif isinstance(size, int) or isinstance(size, float):
