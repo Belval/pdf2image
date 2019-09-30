@@ -6,6 +6,8 @@
 pdf2image's documentation
 ========================================================
 
+pdf2image is a python module that wraps the pdftoppm and pdftocairo utilities to convert PDF into images.
+
 If you are new to the project, start with the installation section!
 
 .. toctree::
@@ -13,4 +15,4 @@ If you are new to the project, start with the installation section!
 
    installation
    overview
-   tutorial
+   reference
