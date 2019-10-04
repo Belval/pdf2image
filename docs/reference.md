@@ -2,7 +2,7 @@
 
 ## Functions
 
-### convert_from_path
+### convert_from_path & convert_from_bytes
 
 Converts a PDF into image(s) 
 
@@ -25,11 +25,34 @@ convert_from_path(
     grayscale=False,
     size=None,
 )
+
+convert_from_bytes(
+    pdf_bytes,
+    dpi=200,
+    output_folder=None,
+    first_page=None,
+    last_page=None,
+    fmt="ppm",
+    thread_count=1,
+    userpw=None,
+    use_cropbox=False,
+    strict=False,
+    transparent=False,
+    single_file=False,
+    output_file=uuid_generator(),
+    poppler_path=None,
+    grayscale=False,
+    size=None,
+)
 ```
 
 **pdf_path**
 
 Path to the PDF file. Can be a string or a `pathlib.Path` object
+
+**pdf_bytes**
+
+Bytes of the PDF file.
 
 **dpi**
 
@@ -89,32 +112,15 @@ Returns grayscale images
 
 **size**
 
+Size of output images, using `None` as any of the dimension will resize and preserve aspect ratio. 
 
+Examples of valid sizes are:
 
-### convert_from_bytes
+- `size=400` will fit the image to a 400x400 box, preserving aspect ratio
+- `size=(400, None)` will make the image 400 pixels wide, preserving aspect ratio
+- `size=(500, 500)` will resize the image to 500x500 pixels, not preserving aspect ratio
 
-Converts a PDF into image(s)
-
-```py
-convert_from_bytes(
-    pdf_file,
-    dpi=200,
-    output_folder=None,
-    first_page=None,
-    last_page=None,
-    fmt="ppm",
-    thread_count=1,
-    userpw=None,
-    use_cropbox=False,
-    strict=False,
-    transparent=False,
-    single_file=False,
-    output_file=uuid_generator(),
-    poppler_path=None,
-    grayscale=False,
-    size=None,
-)
-```
+This behavior is derived directly from the `-scale-to`, `-scale-to-x`, and `-scale-to-y` parameters.
 
 ## Exceptions
 
