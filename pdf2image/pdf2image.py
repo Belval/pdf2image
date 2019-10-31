@@ -66,7 +66,7 @@ def convert_from_path(
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
-            paths_only -> Don't load image(s), return paths instead
+            paths_only -> Don't load image(s), return paths instead (requires output_folder)
     """
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
@@ -221,7 +221,7 @@ def convert_from_bytes(
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
-            paths_only -> Don't load image(s), return paths instead
+            paths_only -> Don't load image(s), return paths instead (requires output_folder)
     """
 
     fh, temp_filename = tempfile.mkstemp()

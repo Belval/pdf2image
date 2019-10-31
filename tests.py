@@ -1331,5 +1331,19 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(len(images_from_path) == 1)
         print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_using_dir_paths_only(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path("./tests/test.pdf", output_folder=path, paths_only=True)
+            self.assertTrue(len(images_from_path) == 1)
+            self.assertTrue(type(images_from_path[0]) == str)
+        print(
+            "test_conversion_from_path_using_dir: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
 if __name__ == "__main__":
     unittest.main()
