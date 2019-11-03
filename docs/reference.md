@@ -4,7 +4,7 @@
 
 ### convert_from_path & convert_from_bytes
 
-Converts a PDF into image(s) 
+Converts a PDF into image(s)
 
 ```py
 convert_from_path(
@@ -24,6 +24,7 @@ convert_from_path(
     poppler_path=None,
     grayscale=False,
     size=None,
+    paths_only=False,
 )
 
 convert_from_bytes(
@@ -43,6 +44,7 @@ convert_from_bytes(
     poppler_path=None,
     grayscale=False,
     size=None,
+    paths_only=False,
 )
 ```
 
@@ -112,7 +114,7 @@ Returns grayscale images
 
 **size**
 
-Size of output images, using `None` as any of the dimension will resize and preserve aspect ratio. 
+Size of output images, using `None` as any of the dimension will resize and preserve aspect ratio.
 
 Examples of valid sizes are:
 
@@ -121,6 +123,10 @@ Examples of valid sizes are:
 - `size=(500, 500)` will resize the image to 500x500 pixels, not preserving aspect ratio
 
 This behavior is derived directly from the `-scale-to`, `-scale-to-x`, and `-scale-to-y` parameters.
+
+**paths_only**
+
+A list of image paths rather than preloaded images are returned.
 
 ## Exceptions
 
