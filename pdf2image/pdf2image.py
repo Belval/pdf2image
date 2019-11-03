@@ -45,6 +45,7 @@ def convert_from_path(
     poppler_path=None,
     grayscale=False,
     size=None,
+    paths_only=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -65,6 +66,7 @@ def convert_from_path(
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
+            paths_only -> Don't load image(s), return paths instead (requires output_folder)
     """
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
@@ -170,7 +172,7 @@ def convert_from_path(
 
         if output_folder is not None:
             images += _load_from_output_folder(
-                output_folder, uid, final_extension, in_memory=auto_temp_dir
+                output_folder, uid, final_extension, paths_only, in_memory=auto_temp_dir
             )
         else:
             images += parse_buffer_func(data)
@@ -198,6 +200,7 @@ def convert_from_bytes(
     poppler_path=None,
     grayscale=False,
     size=None,
+    paths_only=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -218,6 +221,7 @@ def convert_from_bytes(
             poppler_path -> Path to look for poppler binaries
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
+            paths_only -> Don't load image(s), return paths instead (requires output_folder)
     """
 
     fh, temp_filename = tempfile.mkstemp()
@@ -242,6 +246,7 @@ def convert_from_bytes(
                 poppler_path=poppler_path,
                 grayscale=grayscale,
                 size=size,
+                paths_only=paths_only,
             )
     finally:
         os.close(fh)
@@ -364,11 +369,16 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         )
 
 
-def _load_from_output_folder(output_folder, output_file, ext, in_memory=False):
+def _load_from_output_folder(
+    output_folder, output_file, ext, paths_only, in_memory=False
+):
     images = []
     for f in sorted(os.listdir(output_folder)):
         if f.startswith(output_file) and f.split(".")[-1] == ext:
-            images.append(Image.open(os.path.join(output_folder, f)))
-            if in_memory:
-                images[-1].load()
+            if paths_only:
+                images.append(os.path.join(output_folder, f))
+            else:
+                images.append(Image.open(os.path.join(output_folder, f)))
+                if in_memory:
+                    images[-1].load()
     return images
