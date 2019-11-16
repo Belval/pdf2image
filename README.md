@@ -62,9 +62,9 @@ with tempfile.TemporaryDirectory() as path:
 
 Here are the definitions:
 
-`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False, size=None)`
+`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False, size=None, paths_only=False)`
 
-`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False, size=None)`
+`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False, size=None, paths_only=False)`
 
 ## Need help?
 
@@ -72,6 +72,7 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 
 ## What's new?
 
+- `paths_only` parameter will return image paths instead of Image objects, to prevent OOM when converting a big PDF.
 - `size` parameter allows you to define the shape of the resulting images (`-scale-to` in pdftoppm CLI)
     - `size=400` will fit the image to a 400x400 box, preserving aspect ratio
     - `size=(400, None)` will make the image 400 pixels wide, preserving aspect ratio
@@ -82,7 +83,6 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 - Fixed a bug where PNGs buffer with a non-terminating I-E-N-D sequence would throw an exception
 - Fixed a bug that left open file descriptors when using `convert_from_bytes()` (Thank you @FabianUken)
 - `fmt='tiff'` parameter allows you to create .tiff files (You need pdftocairo for this)
-- `transparent` parameter allows you to generate images with no background instead of the usual white one (You need pdftocairo for this)
 
 ## Performance tips
 
