@@ -11,6 +11,7 @@ import types
 import shutil
 import pathlib
 
+from datetime import datetime
 from subprocess import Popen, PIPE
 from PIL import Image
 
@@ -26,7 +27,7 @@ from .parsers import (
 from .exceptions import PDFInfoNotInstalledError, PDFPageCountError, PDFSyntaxError
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
-
+PDFINFO_CONVERT_TO_INT = ["Pages"]
 
 def convert_from_path(
     pdf_path,
@@ -77,7 +78,7 @@ def convert_from_path(
     if isinstance(poppler_path, pathlib.PurePath):
         poppler_path = poppler_path.as_posix()
 
-    page_count = _page_count(pdf_path, userpw, poppler_path=poppler_path)
+    page_count = pdfinfo_from_path(pdf_path, userpw, poppler_path=poppler_path)["Pages"]
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
     parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
@@ -336,7 +337,7 @@ def _get_command_path(command, poppler_path=None):
     return command
 
 
-def _page_count(pdf_path, userpw=None, poppler_path=None):
+def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None):
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
@@ -350,18 +351,39 @@ def _page_count(pdf_path, userpw=None, poppler_path=None):
         proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
 
         out, err = proc.communicate()
-    except:
+
+        d = {}
+        for field in out.decode("utf8", "ignore").split('\n'):
+            sf = field.split(':')
+            key, value = sf[0], ':'.join(sf[1:])
+            if key != "":
+                d[key] = int(value.strip()) if key in PDFINFO_CONVERT_TO_INT else value.strip()
+
+        if "Pages" not in d:
+            raise ValueError
+
+        return d
+
+    except OSError:
         raise PDFInfoNotInstalledError(
             "Unable to get page count. Is poppler installed and in PATH?"
         )
-
-    try:
-        # This will throw if we are unable to get page count
-        return int(re.search(r"Pages:\s+(\d+)", out.decode("utf8", "ignore")).group(1))
-    except:
+    except ValueError:
         raise PDFPageCountError(
-            "Unable to get page count. %s" % err.decode("utf8", "ignore")
+            "Unable to get page count.\n%s" % err.decode("utf8", "ignore")
         )
+
+
+def pdfinfo_from_bytes(pdf_file):
+    fh, temp_filename = tempfile.mkstemp()
+    try:
+        with open(temp_filename, "wb") as f:
+            f.write(pdf_file)
+            f.flush()
+        return pdfinfo_from_path(temp_filename)
+    finally:
+        os.close(fh)
+        os.remove(temp_filename)
 
 
 def _load_from_output_folder(output_folder, output_file, ext, in_memory=False):
