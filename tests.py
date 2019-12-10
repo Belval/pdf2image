@@ -14,7 +14,12 @@ from memory_profiler import profile as profile_memory
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from pdf2image import convert_from_bytes, convert_from_path
+from pdf2image import (
+    convert_from_bytes,
+    convert_from_path,
+    pdfinfo_from_bytes,
+    pdfinfo_from_path,
+)
 from pdf2image.exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
@@ -1330,6 +1335,64 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(images_from_path[0].size[1] == 518)
         self.assertTrue(len(images_from_path) == 1)
         print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
+
+    ## Test pdfinfo
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_from_path(self):
+        start_time = time.time()
+        info = pdfinfo_from_path("./tests/test.pdf")
+        self.assertTrue(info.get("Pages", 0) == 1)
+        print("test_pdfinfo_from_path: {} sec".format(time.time() - start_time))
+    
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_from_bytes(self):
+        start_time = time.time()
+        info = pdfinfo_from_bytes(open("./tests/test.pdf", "rb").read())
+        self.assertTrue(info.get("Pages", 0) == 1)
+        print("test_pdfinfo_from_bytes: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_from_path_241(self):
+        start_time = time.time()
+        info = pdfinfo_from_path("./tests/test_241.pdf")
+        self.assertTrue(info.get("Pages", 0) == 241)
+        print("test_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_from_bytes_241(self):
+        start_time = time.time()
+        info = pdfinfo_from_bytes(open("./tests/test_241.pdf", "rb").read())
+        self.assertTrue(info.get("Pages", 0) == 241)
+        print("test_pdfinfo_from_bytes_241: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_from_path_invalid(self):
+        start_time = time.time()
+        try:
+            info = pdfinfo_from_path("./tests/test.jpg")
+            raise Exception("This should not happen")
+        except PDFPageCountError:
+            pass
+        print("test_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_from_bytes_invalid(self):
+        start_time = time.time()
+        try:
+            info = pdfinfo_from_bytes(open("./tests/test.jpg", "rb").read())
+            raise Exception("This should not happen")
+        except PDFPageCountError:
+            pass
+        print("test_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
+
+    # Test conversion with paths_only    
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
