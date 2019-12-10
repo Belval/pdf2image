@@ -2,8 +2,11 @@
     Define exceptions specific to pdf2image
 """
 
+class PopplerNotInstalledError(Exception):
+    "Happens when poppler is not installed"
+    pass
 
-class PDFInfoNotInstalledError(Exception):
+class PDFInfoNotInstalledError(PopplerNotInstalledError):
     "Happens when pdfinfo is not installed"
     pass
 
