@@ -1331,7 +1331,6 @@ class PDFConversionMethods(unittest.TestCase):
             self.assertTrue(len(images_from_bytes) == 1)
         print("test_conversion_from_bytes_with_quality_and_progressive_and_optimize: {} sec".format(time.time() - start_time))
 
-    @profile
     ## Test size parameter
 
     @profile

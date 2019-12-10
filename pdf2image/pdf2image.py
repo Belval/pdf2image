@@ -24,7 +24,12 @@ from .parsers import (
     parse_buffer_to_png,
 )
 
-from .exceptions import PDFInfoNotInstalledError, PDFPageCountError, PDFSyntaxError
+from .exceptions import (
+    PopplerNotInstalledError,
+    PDFInfoNotInstalledError,
+    PDFPageCountError,
+    PDFSyntaxError
+)
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
 PDFINFO_CONVERT_TO_INT = ["Pages"]
@@ -93,6 +98,14 @@ def convert_from_path(
     use_pdfcairo = use_pdfcairo_format or (
         transparent and parsed_fmt in TRANSPARENT_FILE_TYPES
     )
+
+    poppler_version = _get_poppler_version(
+        "pdftocairo" if use_pdfcairo else "pdftoppm",
+        poppler_path=poppler_path
+    )
+
+    if poppler_version <= 57:
+        jpegopt = None
 
     # If output_file isn't a generator, it will be turned into one
     if not isinstance(output_file, types.GeneratorType):
@@ -362,6 +375,27 @@ def _get_command_path(command, poppler_path=None):
 
     return command
 
+def _get_poppler_version(command, poppler_path=None):
+    command = [_get_command_path(command, poppler_path), "-v"]
+
+    env = os.environ.copy()
+    if poppler_path is not None:
+        env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
+    proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+
+    out, err = proc.communicate()
+
+    try:
+        # TODO: Make this more robust
+        return int(out.decode("utf8", "ignore").split('\n')[0].split(' ')[-1].split('.')[1])
+    except OSError:
+        raise PopplerNotInstalledError(
+            "Unable to get poppler version. Is poppler installed and in PATH?"
+        )
+    except:
+        # Lowest version that includes pdftocairo (2011)
+        return 17
+    
 
 def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None):
     try:
