@@ -13,6 +13,7 @@ convert_from_path(
     output_folder=None,
     first_page=None,
     last_page=None,
+    jpegopt=None,
     fmt="ppm",
     thread_count=1,
     userpw=None,
@@ -34,6 +35,7 @@ convert_from_bytes(
     first_page=None,
     last_page=None,
     fmt="ppm",
+    jpegopt=None,
     thread_count=1,
     userpw=None,
     use_cropbox=False,
@@ -127,6 +129,12 @@ This behavior is derived directly from the `-scale-to`, `-scale-to-x`, and `-sca
 **paths_only**
 
 A list of image paths rather than preloaded images are returned.
+
+**jpegopt**
+
+Provide additional options for jpeg format conversions. Requires `fmt="jpeg"` and is provided as dict, with all
+optinal keywords:
+`jpegopt={"quality": 100, "optimize": True, "progressive": False}
 
 ## Exceptions
 

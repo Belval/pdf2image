@@ -36,6 +36,7 @@ def convert_from_path(
     first_page=None,
     last_page=None,
     fmt="ppm",
+    jpegopt=None,
     thread_count=1,
     userpw=None,
     use_cropbox=False,
@@ -57,6 +58,7 @@ def convert_from_path(
             first_page -> First page to process
             last_page -> Last page to process before stopping
             fmt -> Output image format
+            jpegopt -> jpeg options `quality`, `progressive`, and `optimize` (only for jpeg format)
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
             use_cropbox -> Use cropbox instead of mediabox
@@ -137,6 +139,7 @@ def convert_from_path(
             current_page,
             current_page + thread_page_count - 1,
             parsed_fmt,
+            jpegopt,
             thread_output_file,
             userpw,
             use_cropbox,
@@ -191,6 +194,7 @@ def convert_from_bytes(
     first_page=None,
     last_page=None,
     fmt="ppm",
+    jpegopt=None,
     thread_count=1,
     userpw=None,
     use_cropbox=False,
@@ -212,6 +216,7 @@ def convert_from_bytes(
             first_page -> First page to process
             last_page -> Last page to process before stopping
             fmt -> Output image format
+            jpegopt -> jpeg options `quality`, `progressive`, and `optimize` (only for jpeg format)
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
             use_cropbox -> Use cropbox instead of mediabox
@@ -237,6 +242,7 @@ def convert_from_bytes(
                 first_page=first_page,
                 last_page=last_page,
                 fmt=fmt,
+                jpegopt=jpegopt,
                 thread_count=thread_count,
                 userpw=userpw,
                 use_cropbox=use_cropbox,
@@ -260,6 +266,7 @@ def _build_command(
     first_page,
     last_page,
     fmt,
+    jpegopt,
     output_file,
     userpw,
     use_cropbox,
@@ -282,6 +289,9 @@ def _build_command(
 
     if fmt not in ["pgm", "ppm"]:
         args.append("-" + fmt)
+
+    if fmt in ["jpeg", "jpg"] and jpegopt:
+        args.extend(["-jpegopt", _parse_jpegopt(jpegopt)])
 
     if single_file:
         args.append("-singlefile")
@@ -330,6 +340,17 @@ def _parse_format(fmt, grayscale=False):
         return "pgm", "pgm", parse_buffer_to_pgm, False
     # Unable to parse the format so we'll use the default
     return "ppm", "ppm", parse_buffer_to_ppm, False
+
+
+def _parse_jpegopt(jpegopt):
+    parts = []
+    for k, v in jpegopt.items():
+        if v is True:
+            v = "y"
+        if v is False:
+            v = "n"
+        parts.append("{}={}".format(k, v))
+    return ",".join(parts)
 
 
 def _get_command_path(command, poppler_path=None):
