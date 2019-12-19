@@ -387,12 +387,12 @@ def _get_poppler_version(command, poppler_path=None):
 
     try:
         # TODO: Make this more robust
-        return int(out.decode("utf8", "ignore").split('\n')[0].split(' ')[-1].split('.')[1])
+        return int(err.decode("utf8", "ignore").split('\n')[0].split(' ')[-1].split('.')[1])
     except OSError:
         raise PopplerNotInstalledError(
             "Unable to get poppler version. Is poppler installed and in PATH?"
         )
-    except:
+    except Exception as ex:
         # Lowest version that includes pdftocairo (2011)
         return 17
     
