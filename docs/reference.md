@@ -13,8 +13,8 @@ convert_from_path(
     output_folder=None,
     first_page=None,
     last_page=None,
-    jpegopt=None,
     fmt="ppm",
+    jpegopt=None,
     thread_count=1,
     userpw=None,
     use_cropbox=False,
@@ -77,6 +77,22 @@ Last page that will be converted. `last_page=2` will skip all pages after page 2
 **fmt**
 
 File format or the output images. Supported values are `ppm`, `jpeg`, `png` and `tiff`.
+
+**jpegopt**
+
+Configuration for the jpeg output format. As such, only used with `fmt='jpeg'`.
+
+```
+jpegopt={
+    "quality": 100,
+    "progressive": True,
+    "optimize": True
+}
+```
+
+- `quality`: Selects the JPEG quality value. The value must be an integer between 0 and 100.
+- `progressive`: Select progressive JPEG output. The possible values are `True`, `False`, indicating progressive (yes) or non-progressive (no), respectively.
+- `optimize`: Sets whether to compute optimal Huffman coding tables for the JPEG output, which will create smaller files but make an extra pass over the data. The value must be `True` or `False`, with `True` performing optimization, otherwise the default Huffman tables are used.
 
 **thread_count**
 
