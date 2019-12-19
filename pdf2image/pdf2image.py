@@ -392,7 +392,7 @@ def _get_poppler_version(command, poppler_path=None):
         raise PopplerNotInstalledError(
             "Unable to get poppler version. Is poppler installed and in PATH?"
         )
-    except Exception as ex:
+    except:
         # Lowest version that includes pdftocairo (2011)
         return 17
     
