@@ -1011,7 +1011,7 @@ class PDFConversionMethods(unittest.TestCase):
             self.assertTrue(abs(fd_count_before - fd_count_after) <= 3)
         print(
             "test_close_tempfile_after_conversion: {} sec".format(
-                (time.time() - start_time)
+                time.time() - start_time
             )
         )
 
@@ -1035,7 +1035,7 @@ class PDFConversionMethods(unittest.TestCase):
         [im.close() for im in images_from_path]
         print(
             "test_conversion_from_path_using_poppler_path: {} sec".format(
-                (time.time() - start_time)
+                time.time() - start_time
             )
         )
 
@@ -1057,7 +1057,7 @@ class PDFConversionMethods(unittest.TestCase):
         [im.close() for im in images_from_path]
         print(
             "test_conversion_from_path_using_poppler_path_with_trailing_slash: {} sec".format(
-                (time.time() - start_time)
+                time.time() - start_time
             )
         )
 

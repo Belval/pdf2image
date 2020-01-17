@@ -5,13 +5,11 @@
 
 import os
 import platform
-import re
 import tempfile
 import types
 import shutil
 import pathlib
 
-from datetime import datetime
 from subprocess import Popen, PIPE
 from PIL import Image
 
@@ -33,6 +31,7 @@ from .exceptions import (
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
 PDFINFO_CONVERT_TO_INT = ["Pages"]
+
 
 def convert_from_path(
     pdf_path,
@@ -375,6 +374,7 @@ def _get_command_path(command, poppler_path=None):
 
     return command
 
+
 def _get_poppler_version(command, poppler_path=None):
     command = [_get_command_path(command, poppler_path), "-v"]
 
@@ -391,7 +391,7 @@ def _get_poppler_version(command, poppler_path=None):
     except:
         # Lowest version that includes pdftocairo (2011)
         return 17
-    
+
 
 def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None):
     try:
@@ -441,7 +441,7 @@ def pdfinfo_from_bytes(pdf_file):
         os.close(fh)
         os.remove(temp_filename)
 
-        
+
 def _load_from_output_folder(
     output_folder, output_file, ext, paths_only, in_memory=False
 ):
