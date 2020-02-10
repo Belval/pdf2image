@@ -26,7 +26,7 @@ from .exceptions import (
     PopplerNotInstalledError,
     PDFInfoNotInstalledError,
     PDFPageCountError,
-    PDFSyntaxError
+    PDFSyntaxError,
 )
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
@@ -99,8 +99,7 @@ def convert_from_path(
     )
 
     poppler_version = _get_poppler_version(
-        "pdftocairo" if use_pdfcairo else "pdftoppm",
-        poppler_path=poppler_path
+        "pdftocairo" if use_pdfcairo else "pdftoppm", poppler_path=poppler_path
     )
 
     if poppler_version <= 57:
@@ -387,7 +386,9 @@ def _get_poppler_version(command, poppler_path=None):
 
     try:
         # TODO: Make this more robust
-        return int(err.decode("utf8", "ignore").split('\n')[0].split(' ')[-1].split('.')[1])
+        return int(
+            err.decode("utf8", "ignore").split("\n")[0].split(" ")[-1].split(".")[1]
+        )
     except:
         # Lowest version that includes pdftocairo (2011)
         return 17
@@ -409,11 +410,15 @@ def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None):
         out, err = proc.communicate()
 
         d = {}
-        for field in out.decode("utf8", "ignore").split('\n'):
-            sf = field.split(':')
-            key, value = sf[0], ':'.join(sf[1:])
+        for field in out.decode("utf8", "ignore").split("\n"):
+            sf = field.split(":")
+            key, value = sf[0], ":".join(sf[1:])
             if key != "":
-                d[key] = int(value.strip()) if key in PDFINFO_CONVERT_TO_INT else value.strip()
+                d[key] = (
+                    int(value.strip())
+                    if key in PDFINFO_CONVERT_TO_INT
+                    else value.strip()
+                )
 
         if "Pages" not in d:
             raise ValueError
