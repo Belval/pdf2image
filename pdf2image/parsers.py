@@ -8,8 +8,7 @@ from PIL import Image
 
 
 def parse_buffer_to_ppm(data):
-    """Parse PPM file bytes to Pillow Image
-    """
+    """Parse PPM file bytes to Pillow Image"""
 
     images = []
 
@@ -26,8 +25,7 @@ def parse_buffer_to_ppm(data):
 
 
 def parse_buffer_to_pgm(data):
-    """Parse PGM file bytes to Pillow Image
-    """
+    """Parse PGM file bytes to Pillow Image"""
 
     images = []
 
@@ -44,8 +42,7 @@ def parse_buffer_to_pgm(data):
 
 
 def parse_buffer_to_jpeg(data):
-    """Parse JPEG file bytes to Pillow Image
-    """
+    """Parse JPEG file bytes to Pillow Image"""
 
     return [
         Image.open(BytesIO(image_data + b"\xff\xd9"))
@@ -56,8 +53,7 @@ def parse_buffer_to_jpeg(data):
 
 
 def parse_buffer_to_png(data):
-    """Parse PNG file bytes to Pillow Image
-    """
+    """Parse PNG file bytes to Pillow Image"""
 
     images = []
 

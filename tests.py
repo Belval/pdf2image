@@ -9,7 +9,7 @@ import shutil
 import subprocess
 from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
-
+from multiprocessing.dummy import Pool
 from memory_profiler import profile as profile_memory
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
@@ -1481,6 +1481,18 @@ class PDFConversionMethods(unittest.TestCase):
                 time.time() - start_time
             )
         )
+
+    # Test for issue #125
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed")
+    def test_multithread_conversion(self):
+        start_time = time.time()
+        files = ["./tests/test.pdf", ] * 50
+        p = Pool(10)
+        res = p.map(convert_from_path, files)
+        self.assertTrue(len(res) == 50)
+        print("test_multithread_conversion: {} sec".format(time.time() - start_time))
+
 
 if __name__ == "__main__":
     unittest.main()
