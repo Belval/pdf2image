@@ -72,6 +72,7 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 
 ## What's new?
 
+- Fixed a bug where using `pdf2image` with multiple threads (but not multiple processes) would cause and exception
 - `jpegopt` parameter allows for tuning of the output JPEG when using `fmt="jpeg"` (`-jpegopt` in pdftoppm CLI) (Thank you @abieler)
 - `pdfinfo_from_path` and `pdfinfo_from_bytes` which expose the output of the pdfinfo CLI
 - `paths_only` parameter will return image paths instead of Image objects, to prevent OOM when converting a big PDF
@@ -83,7 +84,6 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 - `single_file` parameter allows you to convert the first PDF page only, without adding digits at the end of the `output_file`
 - Allow the user to specify poppler's installation path with `poppler_path`
 - Fixed a bug where PNGs buffer with a non-terminating I-E-N-D sequence would throw an exception
-- Fixed a bug that left open file descriptors when using `convert_from_bytes()` (Thank you @FabianUken)
 
 ## Performance tips
 
