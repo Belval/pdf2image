@@ -13,7 +13,7 @@ import pathlib
 from subprocess import Popen, PIPE
 from PIL import Image
 
-from .generators import uuid_generator, counter_generator
+from .generators import uuid_generator, counter_generator, ThreadSafeGenerator
 
 from .parsers import (
     parse_buffer_to_pgm,
@@ -106,7 +106,8 @@ def convert_from_path(
         jpegopt = None
 
     # If output_file isn't a generator, it will be turned into one
-    if not isinstance(output_file, types.GeneratorType):
+    if (not isinstance(output_file, types.GeneratorType) and
+        not isinstance(output_file, ThreadSafeGenerator)):
         if single_file:
             output_file = iter([output_file])
         else:
