@@ -27,7 +27,7 @@ class PDFSyntaxError(Exception):
     pass
 
 
-class UnprocessedImages(Exception):
-    """No was processed any image"""
+class UnprocessedImagesError(Exception):
+    """When no images were processed"""
 
     pass

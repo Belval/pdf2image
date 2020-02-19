@@ -27,7 +27,8 @@ from .exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
     PDFSyntaxError,
-    UnprocessedImages)
+    UnprocessedImagesError
+)
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
 PDFINFO_CONVERT_TO_INT = ["Pages"]
@@ -197,7 +198,7 @@ def convert_from_path(
         shutil.rmtree(output_folder)
 
     if len(images) == 0:
-        raise UnprocessedImages
+        raise UnprocessedImagesError
 
     return images
 
