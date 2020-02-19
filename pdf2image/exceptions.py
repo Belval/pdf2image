@@ -25,3 +25,9 @@ class PDFSyntaxError(Exception):
     """Syntax error was thrown during rendering"""
 
     pass
+
+
+class UnprocessedImages(Exception):
+    """No was processed any image"""
+
+    pass
