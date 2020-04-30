@@ -1408,7 +1408,7 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(images_from_path[0].size[0] == 400)
         self.assertTrue(images_from_path[0].size[1] == 518)
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
+        print("test_conversion_from_path_with_2d_tuple_size_with_None_height: {} sec".format(time.time() - start_time))
 
     ## Test pdfinfo
 
@@ -1493,6 +1493,13 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(len(res) == 50)
         print("test_multithread_conversion: {} sec".format(time.time() - start_time))
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_use_pdftocairo(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test.pdf", use_pdftocairo=True)
+        self.assertTrue(len(images_from_path) == 1)
+        print("test_conversion_from_path_with_use_pdftocairo: {} sec".format(time.time() - start_time))
 
 if __name__ == "__main__":
     unittest.main()

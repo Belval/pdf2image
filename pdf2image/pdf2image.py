@@ -78,6 +78,9 @@ def convert_from_path(
             use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
     """
 
+    if use_pdftocairo and fmt == "ppm":
+        fmt = "png"
+
     # We make sure that if passed arguments are Path objects, they're converted to strings
     if isinstance(pdf_path, pathlib.PurePath):
         pdf_path = pdf_path.as_posix()
