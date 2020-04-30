@@ -226,6 +226,7 @@ def convert_from_bytes(
     grayscale=False,
     size=None,
     paths_only=False,
+    use_pdftocairo=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -248,6 +249,7 @@ def convert_from_bytes(
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
             paths_only -> Don't load image(s), return paths instead (requires output_folder)
+            use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
     """
 
     fh, temp_filename = tempfile.mkstemp()
@@ -274,6 +276,7 @@ def convert_from_bytes(
                 grayscale=grayscale,
                 size=size,
                 paths_only=paths_only,
+                use_pdftocairo=use_pdftocairo,
             )
     finally:
         os.close(fh)
