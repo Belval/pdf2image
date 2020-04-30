@@ -52,6 +52,7 @@ def convert_from_path(
     grayscale=False,
     size=None,
     paths_only=False,
+    use_pdftocairo=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -74,6 +75,7 @@ def convert_from_path(
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
             paths_only -> Don't load image(s), return paths instead (requires output_folder)
+            use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
     """
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
@@ -94,7 +96,7 @@ def convert_from_path(
     )
 
     # We use pdftocairo is the format requires it OR we need a transparent output
-    use_pdfcairo = use_pdfcairo_format or (
+    use_pdfcairo = use_pdftocairo or use_pdfcairo_format or (
         transparent and parsed_fmt in TRANSPARENT_FILE_TYPES
     )
 
