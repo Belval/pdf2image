@@ -99,8 +99,10 @@ def convert_from_path(
     )
 
     # We use pdftocairo is the format requires it OR we need a transparent output
-    use_pdfcairo = use_pdftocairo or use_pdfcairo_format or (
-        transparent and parsed_fmt in TRANSPARENT_FILE_TYPES
+    use_pdfcairo = (
+        use_pdftocairo
+        or use_pdfcairo_format
+        or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
     )
 
     poppler_version = _get_poppler_version(
@@ -111,8 +113,9 @@ def convert_from_path(
         jpegopt = None
 
     # If output_file isn't a generator, it will be turned into one
-    if (not isinstance(output_file, types.GeneratorType) and
-        not isinstance(output_file, ThreadSafeGenerator)):
+    if not isinstance(output_file, types.GeneratorType) and not isinstance(
+        output_file, ThreadSafeGenerator
+    ):
         if single_file:
             output_file = iter([output_file])
         else:

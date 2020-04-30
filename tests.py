@@ -804,7 +804,7 @@ class PDFConversionMethods(unittest.TestCase):
     )
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_using_dir_241_with_4_threads(
-        self
+        self,
     ):  # pragma: no cover
         start_time = time.time()
         with TemporaryDirectory() as path:
@@ -827,7 +827,7 @@ class PDFConversionMethods(unittest.TestCase):
     )
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_using_dir_241_with_4_threads(
-        self
+        self,
     ):  # pragma: no cover
         start_time = time.time()
         with TemporaryDirectory() as path:
@@ -1282,44 +1282,79 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_quality(self):
         start_time = time.time()
-        images_from_path = convert_from_path("./tests/test.pdf", fmt="jpeg", jpegopt={"quality": 100})
+        images_from_path = convert_from_path(
+            "./tests/test.pdf", fmt="jpeg", jpegopt={"quality": 100}
+        )
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_quality: {} sec".format(time.time() - start_time))
-
+        print(
+            "test_conversion_from_path_with_quality: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_with_quality(self):
         start_time = time.time()
         with open("./tests/test.pdf", "rb") as pdf_file:
-            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="jpg", jpegopt={"quality": 100})
+            images_from_bytes = convert_from_bytes(
+                pdf_file.read(), fmt="jpg", jpegopt={"quality": 100}
+            )
             self.assertTrue(len(images_from_bytes) == 1)
-        print("test_conversion_from_bytes_with_quality: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_bytes_with_quality: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_quality_and_progressive(self):
         start_time = time.time()
-        images_from_path = convert_from_path("./tests/test.pdf", fmt="jpeg", jpegopt={"quality": 100, "progressive": True})
+        images_from_path = convert_from_path(
+            "./tests/test.pdf",
+            fmt="jpeg",
+            jpegopt={"quality": 100, "progressive": True},
+        )
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_quality_and_progressive: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_quality_and_progressive: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_quality_and_not_progressive(self):
         start_time = time.time()
-        images_from_path = convert_from_path("./tests/test.pdf", fmt="jpeg", jpegopt={"quality": 100, "progressive": False})
+        images_from_path = convert_from_path(
+            "./tests/test.pdf",
+            fmt="jpeg",
+            jpegopt={"quality": 100, "progressive": False},
+        )
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_quality_and_progressive: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_quality_and_progressive: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_with_quality_and_progressive(self):
         start_time = time.time()
         with open("./tests/test.pdf", "rb") as pdf_file:
-            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="jpg", jpegopt={"quality": 100, "progressive": True})
+            images_from_bytes = convert_from_bytes(
+                pdf_file.read(),
+                fmt="jpg",
+                jpegopt={"quality": 100, "progressive": True},
+            )
             self.assertTrue(len(images_from_bytes) == 1)
-        print("test_conversion_from_bytes_with_quality_and_progressive: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_bytes_with_quality_and_progressive: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1327,28 +1362,49 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with open("./tests/test.pdf", "rb") as pdf_file:
             try:
-                images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="jpg", jpegopt={"quality": 100})
+                images_from_bytes = convert_from_bytes(
+                    pdf_file.read(), fmt="jpg", jpegopt={"quality": 100}
+                )
             except PDFInfoNotInstalledError:
                 pass
-        print("test_conversion_from_bytes_with_quality_and_poppler_not_installed: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_bytes_with_quality_and_poppler_not_installed: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_quality_and_progressive_and_optimize(self):
         start_time = time.time()
-        images_from_path = convert_from_path("./tests/test.pdf", fmt="jpeg", jpegopt={"quality": 100, "progressive": True, "optimize": True})
+        images_from_path = convert_from_path(
+            "./tests/test.pdf",
+            fmt="jpeg",
+            jpegopt={"quality": 100, "progressive": True, "optimize": True},
+        )
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_quality_and_progressive_and_optimize: {} sec".format(time.time() - start_time))
-
+        print(
+            "test_conversion_from_path_with_quality_and_progressive_and_optimize: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_with_quality_and_progressive_and_optimize(self):
         start_time = time.time()
         with open("./tests/test.pdf", "rb") as pdf_file:
-            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="jpg", jpegopt={"quality": 100, "progressive": True, "optimize": True})
+            images_from_bytes = convert_from_bytes(
+                pdf_file.read(),
+                fmt="jpg",
+                jpegopt={"quality": 100, "progressive": True, "optimize": True},
+            )
             self.assertTrue(len(images_from_bytes) == 1)
-        print("test_conversion_from_bytes_with_quality_and_progressive_and_optimize: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_bytes_with_quality_and_progressive_and_optimize: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     ## Test size parameter
 
@@ -1359,7 +1415,11 @@ class PDFConversionMethods(unittest.TestCase):
         images_from_path = convert_from_path("./tests/test.pdf", size=400)
         self.assertTrue(images_from_path[0].size[1] == 400)
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_int_size: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_int_size: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1368,7 +1428,11 @@ class PDFConversionMethods(unittest.TestCase):
         images_from_path = convert_from_path("./tests/test.pdf", size=(400,))
         self.assertTrue(images_from_path[0].size[1] == 400)
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_1d_tuple_size: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_1d_tuple_size: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1377,18 +1441,26 @@ class PDFConversionMethods(unittest.TestCase):
         images_from_path = convert_from_path("./tests/test.pdf", size=(400, 400))
         self.assertTrue(images_from_path[0].size == (400, 400))
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_2d_tuple_size: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_2d_tuple_size: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_invalid_size(self):
         start_time = time.time()
         try:
-            images_from_path = convert_from_path("./tests/test.pdf", size='bad value')
+            images_from_path = convert_from_path("./tests/test.pdf", size="bad value")
             raise Exception("This should not happen")
         except ValueError:
             pass
-        print("test_conversion_from_path_with_invalid_size: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_invalid_size: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1398,7 +1470,11 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(images_from_path[0].size[0] == 310)
         self.assertTrue(images_from_path[0].size[1] == 400)
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_2d_tuple_size_with_None_width: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1408,7 +1484,11 @@ class PDFConversionMethods(unittest.TestCase):
         self.assertTrue(images_from_path[0].size[0] == 400)
         self.assertTrue(images_from_path[0].size[1] == 518)
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_2d_tuple_size_with_None_height: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_2d_tuple_size_with_None_height: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     ## Test pdfinfo
 
@@ -1419,7 +1499,7 @@ class PDFConversionMethods(unittest.TestCase):
         info = pdfinfo_from_path("./tests/test.pdf")
         self.assertTrue(info.get("Pages", 0) == 1)
         print("test_pdfinfo_from_path: {} sec".format(time.time() - start_time))
-    
+
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_pdfinfo_from_bytes(self):
@@ -1466,14 +1546,16 @@ class PDFConversionMethods(unittest.TestCase):
             pass
         print("test_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
 
-    # Test conversion with paths_only    
+    # Test conversion with paths_only
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_using_dir_paths_only(self):
         start_time = time.time()
         with TemporaryDirectory() as path:
-            images_from_path = convert_from_path("./tests/test.pdf", output_folder=path, paths_only=True)
+            images_from_path = convert_from_path(
+                "./tests/test.pdf", output_folder=path, paths_only=True
+            )
             self.assertTrue(len(images_from_path) == 1)
             self.assertTrue(type(images_from_path[0]) == str)
         print(
@@ -1487,7 +1569,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed")
     def test_multithread_conversion(self):
         start_time = time.time()
-        files = ["./tests/test.pdf", ] * 50
+        files = ["./tests/test.pdf",] * 50
         p = Pool(10)
         res = p.map(convert_from_path, files)
         self.assertTrue(len(res) == 50)
@@ -1499,7 +1581,12 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         images_from_path = convert_from_path("./tests/test.pdf", use_pdftocairo=True)
         self.assertTrue(len(images_from_path) == 1)
-        print("test_conversion_from_path_with_use_pdftocairo: {} sec".format(time.time() - start_time))
+        print(
+            "test_conversion_from_path_with_use_pdftocairo: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
