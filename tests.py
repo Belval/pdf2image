@@ -1591,7 +1591,7 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_with_use_pdftocairo(self):
         start_time = time.time()
-        images_from_bytes = convert_from_bytes("./tests/test.pdf", use_pdftocairo=True)
+        images_from_bytes = convert_from_bytes(open("./tests/test.pdf", "rb").read(), use_pdftocairo=True)
         self.assertTrue(len(images_from_bytes) == 1)
         print(
             "test_conversion_from_bytes_with_use_pdftocairo: {} sec".format(
