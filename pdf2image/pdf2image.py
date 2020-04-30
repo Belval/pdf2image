@@ -52,6 +52,7 @@ def convert_from_path(
     grayscale=False,
     size=None,
     paths_only=False,
+    use_pdftocairo=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -74,7 +75,11 @@ def convert_from_path(
             grayscale -> Output grayscale image(s)
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
             paths_only -> Don't load image(s), return paths instead (requires output_folder)
+            use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
     """
+
+    if use_pdftocairo and fmt == "ppm":
+        fmt = "png"
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
     if isinstance(pdf_path, pathlib.PurePath):
@@ -94,8 +99,10 @@ def convert_from_path(
     )
 
     # We use pdftocairo is the format requires it OR we need a transparent output
-    use_pdfcairo = use_pdfcairo_format or (
-        transparent and parsed_fmt in TRANSPARENT_FILE_TYPES
+    use_pdfcairo = (
+        use_pdftocairo
+        or use_pdfcairo_format
+        or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
     )
 
     poppler_version = _get_poppler_version(
@@ -106,8 +113,9 @@ def convert_from_path(
         jpegopt = None
 
     # If output_file isn't a generator, it will be turned into one
-    if (not isinstance(output_file, types.GeneratorType) and
-        not isinstance(output_file, ThreadSafeGenerator)):
+    if not isinstance(output_file, types.GeneratorType) and not isinstance(
+        output_file, ThreadSafeGenerator
+    ):
         if single_file:
             output_file = iter([output_file])
         else:
