@@ -406,12 +406,15 @@ def _get_poppler_version(command, poppler_path=None):
         return 17
 
 
-def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None):
+def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False):
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
         if userpw is not None:
             command.extend(["-upw", userpw])
+
+        if rawdates:
+            command.extend(["-rawdates"])
 
         # Add poppler path to LD_LIBRARY_PATH
         env = os.environ.copy()
@@ -447,13 +450,13 @@ def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None):
         )
 
 
-def pdfinfo_from_bytes(pdf_file):
+def pdfinfo_from_bytes(pdf_file, userpw=None, rawdates=False):
     fh, temp_filename = tempfile.mkstemp()
     try:
         with open(temp_filename, "wb") as f:
             f.write(pdf_file)
             f.flush()
-        return pdfinfo_from_path(temp_filename)
+        return pdfinfo_from_path(temp_filename, userpw=userpw, rawdates=rawdates)
     finally:
         os.close(fh)
         os.remove(temp_filename)
