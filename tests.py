@@ -1599,6 +1599,29 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_rawdates(self):
+        start_time = time.time()
+        info = pdfinfo_from_path("./tests/test.pdf", rawdates=True)
+        self.assertTrue("D:" in info["CreationDate"])
+        print(
+            "test_pdfinfo_rawdates: {} sec".format(time.time() - start_time)
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_pdfinfo_locked_pdf_with_userpw_only(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            with open("./tests/test_locked_user_only.pdf", "rb") as pdf_file:
+                info = pdfinfo_from_bytes(
+                    pdf_file.read(), userpw="pdf2image"
+                )
+                self.assertTrue("CreationDate" in info)
+        print(
+            "test_pdfinfo_locked_pdf_with_userpw_only: {} sec".format(time.time() - start_time)
+        )
 
 if __name__ == "__main__":
     unittest.main()
