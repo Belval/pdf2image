@@ -27,7 +27,7 @@ from .exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
     PDFSyntaxError,
-    RunPopplerTimeoutError,
+    PDFPopplerTimeoutError,
 )
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
@@ -196,7 +196,7 @@ def convert_from_path(
         except TimeoutExpired:
             proc.kill()
             outs, errs = proc.communicate()
-            raise RunPopplerTimeoutError("Run poppler poppler timeout.")
+            raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
 
         if b"Syntax Error" in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
@@ -406,7 +406,7 @@ def _get_poppler_version(command, poppler_path=None, timeout=60):
     except TimeoutExpired:
         proc.kill()
         outs, errs = proc.communicate()
-        raise RunPopplerTimeoutError("Run poppler poppler timeout.")
+        raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
 
     try:
         # TODO: Make this more robust
@@ -439,7 +439,7 @@ def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False, 
         except TimeoutExpired:
             proc.kill()
             outs, errs = proc.communicate()
-            raise RunPopplerTimeoutError("Run poppler poppler timeout.")
+            raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
 
         d = {}
         for field in out.decode("utf8", "ignore").split("\n"):

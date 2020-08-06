@@ -27,7 +27,7 @@ class PDFSyntaxError(Exception):
     pass
 
 
-class RunPopplerTimeoutError(Exception):
+class PDFPopplerTimeoutError(Exception):
     """Timeout when pdf convert image."""
 
     pass
