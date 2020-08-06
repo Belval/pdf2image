@@ -25,3 +25,9 @@ class PDFSyntaxError(Exception):
     """Syntax error was thrown during rendering"""
 
     pass
+
+
+class RunPopplerTimeoutError(Exception):
+    """Timeout when pdf convert image."""
+
+    pass

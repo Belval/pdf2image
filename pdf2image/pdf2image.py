@@ -10,7 +10,7 @@ import types
 import shutil
 import pathlib
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, TimeoutExpired
 from PIL import Image
 
 from .generators import uuid_generator, counter_generator, ThreadSafeGenerator
@@ -27,6 +27,7 @@ from .exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
     PDFSyntaxError,
+    RunPopplerTimeoutError,
 )
 
 TRANSPARENT_FILE_TYPES = ["png", "tiff"]
@@ -53,6 +54,7 @@ def convert_from_path(
     size=None,
     paths_only=False,
     use_pdftocairo=False,
+    timeout=600,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -189,7 +191,12 @@ def convert_from_path(
     images = []
 
     for uid, proc in processes:
-        data, err = proc.communicate()
+        try:
+            data, err = proc.communicate(timeout=timeout)
+        except TimeoutExpired:
+            proc.kill()
+            outs, errs = proc.communicate()
+            raise RunPopplerTimeoutError("Run poppler poppler timeout.")
 
         if b"Syntax Error" in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
@@ -386,7 +393,7 @@ def _get_command_path(command, poppler_path=None):
     return command
 
 
-def _get_poppler_version(command, poppler_path=None):
+def _get_poppler_version(command, poppler_path=None, timeout=60):
     command = [_get_command_path(command, poppler_path), "-v"]
 
     env = os.environ.copy()
@@ -394,7 +401,12 @@ def _get_poppler_version(command, poppler_path=None):
         env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
     proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
 
-    out, err = proc.communicate()
+    try:
+        data, err = proc.communicate(timeout=timeout)
+    except TimeoutExpired:
+        proc.kill()
+        outs, errs = proc.communicate()
+        raise RunPopplerTimeoutError("Run poppler poppler timeout.")
 
     try:
         # TODO: Make this more robust
@@ -406,7 +418,7 @@ def _get_poppler_version(command, poppler_path=None):
         return 17
 
 
-def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False):
+def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False, timeout=60):
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
@@ -422,7 +434,12 @@ def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False):
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
         proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
 
-        out, err = proc.communicate()
+        try:
+            out, err = proc.communicate(timeout=timeout)
+        except TimeoutExpired:
+            proc.kill()
+            outs, errs = proc.communicate()
+            raise RunPopplerTimeoutError("Run poppler poppler timeout.")
 
         d = {}
         for field in out.decode("utf8", "ignore").split("\n"):
