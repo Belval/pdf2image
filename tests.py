@@ -24,6 +24,7 @@ from pdf2image.exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
     PDFSyntaxError,
+    PDFPopplerTimeoutError,
 )
 
 from functools import wraps
@@ -1622,6 +1623,22 @@ class PDFConversionMethods(unittest.TestCase):
         print(
             "test_pdfinfo_locked_pdf_with_userpw_only: {} sec".format(time.time() - start_time)
         )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_timeout_pdfinfo_from_path_241(self):
+        start_time = time.time()
+        with self.assertRaises(PDFPopplerTimeoutError):
+            info = pdfinfo_from_path("./tests/test_241.pdf", timeout=0.00001)
+        print("test_timeout_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_timeout_convert_from_path_241(self):
+        start_time = time.time()
+        with self.assertRaises(PDFPopplerTimeoutError):
+            imgs = convert_from_path("./tests/test_241.pdf", timeout=1)
+        print("test_timeout_convert_from_path_241: {} sec".format(time.time() - start_time))
 
 if __name__ == "__main__":
     unittest.main()
