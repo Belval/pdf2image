@@ -78,6 +78,7 @@ def convert_from_path(
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
             paths_only -> Don't load image(s), return paths instead (requires output_folder)
             use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
+            timeout -> Raise PDFPopplerTimeoutError after the given time
     """
 
     if use_pdftocairo and fmt == "ppm":
@@ -234,6 +235,7 @@ def convert_from_bytes(
     size=None,
     paths_only=False,
     use_pdftocairo=False,
+    timeout=600,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -284,6 +286,7 @@ def convert_from_bytes(
                 size=size,
                 paths_only=paths_only,
                 use_pdftocairo=use_pdftocairo,
+                timeout=timeout,
             )
     finally:
         os.close(fh)
@@ -418,7 +421,9 @@ def _get_poppler_version(command, poppler_path=None, timeout=60):
         return 17
 
 
-def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False, timeout=60):
+def pdfinfo_from_path(
+    pdf_path, userpw=None, poppler_path=None, rawdates=False, timeout=60
+):
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
@@ -467,7 +472,9 @@ def pdfinfo_from_path(pdf_path, userpw=None, poppler_path=None, rawdates=False, 
         )
 
 
-def pdfinfo_from_bytes(pdf_file, userpw=None, rawdates=False):
+def pdfinfo_from_bytes(
+    pdf_file, userpw=None, poppler_path=None, rawdates=False, timeout=60
+):
     fh, temp_filename = tempfile.mkstemp()
     try:
         with open(temp_filename, "wb") as f:
