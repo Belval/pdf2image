@@ -72,6 +72,7 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 
 ## What's new?
 
+- Add `timeout` parameter which raises `PDFPopplerTimeoutError` after the given number of seconds.
 - Add `use_pdftocairo` parameter which forces `pdf2image` to use `pdftocairo`. Should improve performance.
 - Fixed a bug where using `pdf2image` with multiple threads (but not multiple processes) would cause and exception
 - `jpegopt` parameter allows for tuning of the output JPEG when using `fmt="jpeg"` (`-jpegopt` in pdftoppm CLI) (Thank you @abieler)
@@ -84,7 +85,6 @@ Use the [mattermost chat](https://mattermost.belval.org/signup_user_complete/?id
 - `grayscale` parameter allows you to convert images to grayscale (`-gray` in pdftoppm CLI)
 - `single_file` parameter allows you to convert the first PDF page only, without adding digits at the end of the `output_file`
 - Allow the user to specify poppler's installation path with `poppler_path`
-- Fixed a bug where PNGs buffer with a non-terminating I-E-N-D sequence would throw an exception
 
 ## Performance tips
 
