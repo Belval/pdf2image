@@ -7,6 +7,7 @@ import unittest
 import time
 import shutil
 import subprocess
+from inspect import signature
 from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 from multiprocessing.dummy import Pool
@@ -1625,6 +1626,23 @@ class PDFConversionMethods(unittest.TestCase):
         )
 
     @profile
+    def test_convert_from_functions_same_number_of_parameters(self):
+        start_time = time.time()
+        self.assertEqual(
+            len(signature(convert_from_path).parameters),
+            len(signature(convert_from_bytes).parameters),
+        )
+        print("test_convert_from_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
+
+    @profile
+    def test_pdfinfo_functions_same_number_of_parameters(self):
+        start_time = time.time()
+        self.assertEqual(
+            len(signature(pdfinfo_from_path).parameters),
+            len(signature(pdfinfo_from_bytes).parameters),
+        )
+        print("test_pdfinfo_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
+    
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_timeout_pdfinfo_from_path_241(self):
         start_time = time.time()
