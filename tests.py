@@ -7,6 +7,7 @@ import unittest
 import time
 import shutil
 import subprocess
+from inspect import signature
 from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 from multiprocessing.dummy import Pool
@@ -24,6 +25,7 @@ from pdf2image.exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
     PDFSyntaxError,
+    PDFPopplerTimeoutError,
 )
 
 from functools import wraps
@@ -1622,6 +1624,39 @@ class PDFConversionMethods(unittest.TestCase):
         print(
             "test_pdfinfo_locked_pdf_with_userpw_only: {} sec".format(time.time() - start_time)
         )
+
+    @profile
+    def test_convert_from_functions_same_number_of_parameters(self):
+        start_time = time.time()
+        self.assertEqual(
+            len(signature(convert_from_path).parameters),
+            len(signature(convert_from_bytes).parameters),
+        )
+        print("test_convert_from_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
+
+    @profile
+    def test_pdfinfo_functions_same_number_of_parameters(self):
+        start_time = time.time()
+        self.assertEqual(
+            len(signature(pdfinfo_from_path).parameters),
+            len(signature(pdfinfo_from_bytes).parameters),
+        )
+        print("test_pdfinfo_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
+    
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_timeout_pdfinfo_from_path_241(self):
+        start_time = time.time()
+        with self.assertRaises(PDFPopplerTimeoutError):
+            info = pdfinfo_from_path("./tests/test_241.pdf", timeout=0.00001)
+        print("test_timeout_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_timeout_convert_from_path_241(self):
+        start_time = time.time()
+        with self.assertRaises(PDFPopplerTimeoutError):
+            imgs = convert_from_path("./tests/test_241.pdf", timeout=1)
+        print("test_timeout_convert_from_path_241: {} sec".format(time.time() - start_time))
 
 if __name__ == "__main__":
     unittest.main()
