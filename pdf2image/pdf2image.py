@@ -54,7 +54,7 @@ def convert_from_path(
     size=None,
     paths_only=False,
     use_pdftocairo=False,
-    timeout=600,
+    timeout=None,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -235,7 +235,7 @@ def convert_from_bytes(
     size=None,
     paths_only=False,
     use_pdftocairo=False,
-    timeout=600,
+    timeout=None,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -396,7 +396,7 @@ def _get_command_path(command, poppler_path=None):
     return command
 
 
-def _get_poppler_version(command, poppler_path=None, timeout=60):
+def _get_poppler_version(command, poppler_path=None, timeout=None):
     command = [_get_command_path(command, poppler_path), "-v"]
 
     env = os.environ.copy()
@@ -422,7 +422,7 @@ def _get_poppler_version(command, poppler_path=None, timeout=60):
 
 
 def pdfinfo_from_path(
-    pdf_path, userpw=None, poppler_path=None, rawdates=False, timeout=60
+    pdf_path, userpw=None, poppler_path=None, rawdates=False, timeout=None
 ):
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
@@ -473,7 +473,7 @@ def pdfinfo_from_path(
 
 
 def pdfinfo_from_bytes(
-    pdf_file, userpw=None, poppler_path=None, rawdates=False, timeout=60
+    pdf_file, userpw=None, poppler_path=None, rawdates=False, timeout=None
 ):
     fh, temp_filename = tempfile.mkstemp()
     try:
