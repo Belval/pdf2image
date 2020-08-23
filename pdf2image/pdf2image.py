@@ -259,6 +259,7 @@ def convert_from_bytes(
             size -> Size of the resulting image(s), uses the Pillow (width, height) standard
             paths_only -> Don't load image(s), return paths instead (requires output_folder)
             use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
+            timeout -> Raise PDFPopplerTimeoutError after the given time
     """
 
     fh, temp_filename = tempfile.mkstemp()
