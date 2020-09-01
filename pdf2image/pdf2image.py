@@ -9,6 +9,7 @@ import tempfile
 import types
 import shutil
 import pathlib
+import subprocess
 
 from subprocess import Popen, PIPE, TimeoutExpired
 from PIL import Image
@@ -185,8 +186,11 @@ def convert_from_path(
         if poppler_path is not None:
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
         # Spawn the process and save its uuid
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        
         processes.append(
-            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE))
+            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo))
         )
 
     images = []
