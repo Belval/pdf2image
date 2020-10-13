@@ -481,7 +481,8 @@ def pdfinfo_from_bytes(
         with open(temp_filename, "wb") as f:
             f.write(pdf_file)
             f.flush()
-        return pdfinfo_from_path(temp_filename, userpw=userpw, rawdates=rawdates)
+        return pdfinfo_from_path(temp_filename, userpw=userpw, rawdates=rawdates,
+                                 poppler_path=poppler_path)
     finally:
         os.close(fh)
         os.remove(temp_filename)
