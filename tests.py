@@ -1228,6 +1228,52 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    ## Test mono option
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_mono_from_bytes(self):
+        start_time = time.time()
+        with open("./tests/test_14.pdf", "rb") as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), mono=True)
+            self.assertTrue(images_from_bytes[0].mode == "1")
+        print(
+            "test_conversion_to_mono_from_bytes_14: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_mono_from_path(self):
+        start_time = time.time()
+        images_from_path = convert_from_path("./tests/test_14.pdf", mono=True)
+        print("images_from_path 2 ", images_from_path)
+        self.assertTrue(images_from_path[0].mode == "1")
+        [im.close() for im in images_from_path]
+        print(
+            "test_conversion_to_mono_from_path_14: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_mono_from_path_using_dir(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path(
+                "./tests/test_14.pdf", output_folder=path, mono=True
+            )
+            print("images_from_path 1", images_from_path)
+            self.assertTrue(images_from_path[0].mode == "1")
+            [im.close() for im in images_from_path]
+        print(
+            "test_conversion_to_mono_from_path_using_dir_14: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
     ## Test pathlib support
 
     @profile
@@ -1642,7 +1688,7 @@ class PDFConversionMethods(unittest.TestCase):
             len(signature(pdfinfo_from_bytes).parameters),
         )
         print("test_pdfinfo_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
-    
+
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_timeout_pdfinfo_from_path_241(self):
         start_time = time.time()

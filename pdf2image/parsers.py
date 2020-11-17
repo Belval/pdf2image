@@ -7,6 +7,22 @@ from io import BytesIO
 from PIL import Image
 
 
+def parse_buffer_to_pbm(data):
+    """Parse PBM file bytes to Pillow Image"""
+
+    images = []
+
+    index = 0
+
+    while index < len(data):
+        code, size = tuple(data[index : index + 40].split(b"\n")[0:2]) # no rgb section in pbm
+        size_x, size_y = tuple(size.split(b" "))
+        file_size = len(code) + len(size) + 2 + int(size_x) * int(size_y) * 3
+        images.append(Image.open(BytesIO(data[index : index + file_size])))
+        index += file_size
+
+    return images
+
 def parse_buffer_to_ppm(data):
     """Parse PPM file bytes to Pillow Image"""
 
