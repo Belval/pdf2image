@@ -9,6 +9,7 @@ import tempfile
 import types
 import shutil
 import pathlib
+import re
 
 from subprocess import Popen, PIPE, TimeoutExpired
 from PIL import Image
@@ -413,9 +414,8 @@ def _get_poppler_version(command, poppler_path=None, timeout=None):
         raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
 
     try:
-        # TODO: Make this more robust
         return int(
-            err.decode("utf8", "ignore").split("\n")[0].split(" ")[-1].split(".")[1]
+            re.findall("pdftocairo\sversion\s\d{1,3}.\d{1,3}.\d{1,3}", err.decode("utf8", "ignore"))[0].split(" ")[2]
         )
     except:
         # Lowest version that includes pdftocairo (2011)
