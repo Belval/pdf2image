@@ -30,7 +30,7 @@ from pdf2image.exceptions import (
 
 from functools import wraps
 
-PROFILE_MEMORY = False
+PROFILE_MEMORY = os.environ.get('PROFILE_MEMORY', False)
 
 try:
     subprocess.call(
