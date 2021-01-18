@@ -1074,7 +1074,7 @@ class PDFConversionMethods(unittest.TestCase):
         )
         self.assertTrue(len(images_from_path) == 1)
         print(
-            "test_conversion_from_path_14: {} sec".format(
+            "test_conversion_from_path_14_first_page_1_last_page_1: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
@@ -1088,7 +1088,7 @@ class PDFConversionMethods(unittest.TestCase):
         )
         self.assertTrue(len(images_from_path) == 0)
         print(
-            "test_conversion_from_path_14: {} sec".format(
+            "test_conversion_from_path_14_first_page_12_last_page_1: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
