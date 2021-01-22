@@ -30,7 +30,7 @@ from pdf2image.exceptions import (
 
 from functools import wraps
 
-PROFILE_MEMORY = False
+PROFILE_MEMORY = os.environ.get('PROFILE_MEMORY', False)
 
 try:
     subprocess.call(
@@ -1074,7 +1074,7 @@ class PDFConversionMethods(unittest.TestCase):
         )
         self.assertTrue(len(images_from_path) == 1)
         print(
-            "test_conversion_from_path_14: {} sec".format(
+            "test_conversion_from_path_14_first_page_1_last_page_1: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
@@ -1088,7 +1088,7 @@ class PDFConversionMethods(unittest.TestCase):
         )
         self.assertTrue(len(images_from_path) == 0)
         print(
-            "test_conversion_from_path_14: {} sec".format(
+            "test_conversion_from_path_14_first_page_12_last_page_1: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
@@ -1506,7 +1506,8 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_pdfinfo_from_bytes(self):
         start_time = time.time()
-        info = pdfinfo_from_bytes(open("./tests/test.pdf", "rb").read())
+        with open("./tests/test.pdf", "rb") as fh:
+            info = pdfinfo_from_bytes(fh.read())
         self.assertTrue(info.get("Pages", 0) == 1)
         print("test_pdfinfo_from_bytes: {} sec".format(time.time() - start_time))
 
@@ -1522,7 +1523,8 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_pdfinfo_from_bytes_241(self):
         start_time = time.time()
-        info = pdfinfo_from_bytes(open("./tests/test_241.pdf", "rb").read())
+        with open("./tests/test_241.pdf", "rb") as fh:
+            info = pdfinfo_from_bytes(fh.read())
         self.assertTrue(info.get("Pages", 0) == 241)
         print("test_pdfinfo_from_bytes_241: {} sec".format(time.time() - start_time))
 
@@ -1542,7 +1544,8 @@ class PDFConversionMethods(unittest.TestCase):
     def test_pdfinfo_from_bytes_invalid(self):
         start_time = time.time()
         try:
-            info = pdfinfo_from_bytes(open("./tests/test.jpg", "rb").read())
+            with open("./tests/test.jpg", "rb") as fh:
+                info = pdfinfo_from_bytes(fh.read())
             raise Exception("This should not happen")
         except PDFPageCountError:
             pass
@@ -1572,8 +1575,8 @@ class PDFConversionMethods(unittest.TestCase):
     def test_multithread_conversion(self):
         start_time = time.time()
         files = ["./tests/test.pdf",] * 50
-        p = Pool(10)
-        res = p.map(convert_from_path, files)
+        with Pool(10) as p:
+            res = p.map(convert_from_path, files)
         self.assertTrue(len(res) == 50)
         print("test_multithread_conversion: {} sec".format(time.time() - start_time))
 
@@ -1593,7 +1596,8 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_with_use_pdftocairo(self):
         start_time = time.time()
-        images_from_bytes = convert_from_bytes(open("./tests/test.pdf", "rb").read(), use_pdftocairo=True)
+        with open("./tests/test.pdf", "rb") as fh:
+            images_from_bytes = convert_from_bytes(fh.read(), use_pdftocairo=True)
         self.assertTrue(len(images_from_bytes) == 1)
         print(
             "test_conversion_from_bytes_with_use_pdftocairo: {} sec".format(
