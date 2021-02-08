@@ -13,7 +13,7 @@ import pathlib
 from subprocess import Popen, PIPE, TimeoutExpired
 from PIL import Image
 
-from .generators import uuid_generator, counter_generator, ThreadSafeGenerator
+from .generators import uuid_generator, counter_generator
 
 from .parsers import (
     parse_buffer_to_pgm,
@@ -115,15 +115,6 @@ def convert_from_path(
     if poppler_version <= 57:
         jpegopt = None
 
-    # If output_file isn't a generator, it will be turned into one
-    if not isinstance(output_file, types.GeneratorType) and not isinstance(
-        output_file, ThreadSafeGenerator
-    ):
-        if single_file:
-            output_file = iter([output_file])
-        else:
-            output_file = counter_generator(output_file)
-
     if thread_count < 1:
         thread_count = 1
 
@@ -147,14 +138,12 @@ def convert_from_path(
     if thread_count > page_count:
         thread_count = page_count
 
-    reminder = page_count % thread_count
+    remainder = page_count % thread_count
     current_page = first_page
     processes = []
-    for _ in range(thread_count):
-        thread_output_file = next(output_file)
-
+    for thread_id in range(thread_count):
         # Get the number of pages the thread will be processing
-        thread_page_count = page_count // thread_count + int(reminder > 0)
+        thread_page_count = page_count // thread_count + int(remainder > 0)
         # Build the command accordingly
         args = _build_command(
             ["-r", str(dpi), pdf_path],
@@ -163,7 +152,7 @@ def convert_from_path(
             current_page + thread_page_count - 1,
             parsed_fmt,
             jpegopt,
-            thread_output_file,
+            output_file,
             userpw,
             use_cropbox,
             transparent,
@@ -179,14 +168,14 @@ def convert_from_path(
 
         # Update page values
         current_page = current_page + thread_page_count
-        reminder -= int(reminder > 0)
+        remainder -= int(remainder > 0)
         # Add poppler path to LD_LIBRARY_PATH
         env = os.environ.copy()
         if poppler_path is not None:
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
         # Spawn the process and save its uuid
         processes.append(
-            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE))
+            (thread_id, Popen(args, env=env, stdout=PIPE, stderr=PIPE))
         )
 
     images = []
@@ -202,12 +191,12 @@ def convert_from_path(
         if b"Syntax Error" in err and strict:
             raise PDFSyntaxError(err.decode("utf8", "ignore"))
 
-        if output_folder is not None:
-            images += _load_from_output_folder(
-                output_folder, uid, final_extension, paths_only, in_memory=auto_temp_dir
-            )
-        else:
-            images += parse_buffer_func(data)
+    if output_folder is not None:
+        images += _load_from_output_folder(
+            output_folder, output_file, final_extension, paths_only, in_memory=auto_temp_dir
+        )
+    else:
+        images += parse_buffer_func(data)
 
     if auto_temp_dir:
         shutil.rmtree(output_folder)
