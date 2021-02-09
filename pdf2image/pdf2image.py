@@ -127,7 +127,7 @@ def convert_from_path(
     if thread_count < 1:
         thread_count = 1
 
-    if first_page is None:
+    if first_page is None or first_page < 1:
         first_page = 1
 
     if last_page is None or last_page > page_count:
