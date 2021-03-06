@@ -108,11 +108,11 @@ def convert_from_path(
         or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
     )
 
-    poppler_version = _get_poppler_version(
+    poppler_version_major, poppler_version_minor = _get_poppler_version(
         "pdftocairo" if use_pdfcairo else "pdftoppm", poppler_path=poppler_path
     )
 
-    if poppler_version <= 57:
+    if poppler_version_major == 0 and poppler_version_minor <= 57:
         jpegopt = None
 
     # If output_file isn't a generator, it will be turned into one
@@ -414,12 +414,11 @@ def _get_poppler_version(command, poppler_path=None, timeout=None):
 
     try:
         # TODO: Make this more robust
-        return int(
-            err.decode("utf8", "ignore").split("\n")[0].split(" ")[-1].split(".")[1]
-        )
+        version = err.decode("utf8", "ignore").split("\n")[0].split(" ")[-1].split(".")
+        return int(version[0]), int(version[1])
     except:
         # Lowest version that includes pdftocairo (2011)
-        return 17
+        return 0, 17
 
 
 def pdfinfo_from_path(
