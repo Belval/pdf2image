@@ -1,13 +1,13 @@
 import argparse
 
-from generators import uuid_generator
-from pdf2image import convert_from_path
-
 # repackage will get around the issue of trying to call a runnable script with a __main__ block
 # inside a module that has relative imports
 # See https://stackoverflow.com/questions/16981921/relative-imports-in-python-3#47670795
 import repackage
 repackage.up()
+
+from pdf2image import convert_from_path
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Command line call to convert_from_path - Convert PDF to Image will throw whenever one of the condition is reached.", prog="convert_from_path.py")
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("--strict", action="store_true", help="flag: When a Syntax Error is thrown, it will be raised as an Exception.")
     parser.add_argument("--transparent", action="store_true", help="flag: Output with a transparent background instead of a white one.")
     parser.add_argument("--single_file", action="store_true", help="flag: Uses the -singlefile option from pdftoppm/pdftocairo.")
-    parser.add_argument("--output_file", default=uuid_generator(), help="str: What is the output filename or generator. Default=uuid_generator")
+    parser.add_argument("--output_file", help="str: What is the output filename or generator. Default=uuid")
     parser.add_argument("--poppler_path", help="str: Path to look for poppler binaries.")
     parser.add_argument("--grayscale", action="store_true", help="flag: Output grayscale image(s).")
     parser.add_argument("--size", nargs='+', help="int or tuple: Size of the resulting image(s), uses the Pillow (width, height) standard. Ex: `--size 1000` or `--size None 2400`")
@@ -49,9 +49,9 @@ if __name__ == "__main__":
 
 
     results = convert_from_path(
-        args.pdf_path, 
-        dpi=args.dpi, 
-        output_folder=args.output_folder, 
+        args.pdf_path,
+        dpi=args.dpi,
+        output_folder=args.output_folder,
         first_page=args.first_page,
         last_page=args.last_page,
         fmt=args.fmt,
