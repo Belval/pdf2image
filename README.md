@@ -68,6 +68,7 @@ Here are the definitions:
 
 ## What's new?
 
+- Fix console opening on Windows (Thank you @OhMyAgnes!)
 - Add `timeout` parameter which raises `PDFPopplerTimeoutError` after the given number of seconds.
 - Add `use_pdftocairo` parameter which forces `pdf2image` to use `pdftocairo`. Should improve performance.
 - Fixed a bug where using `pdf2image` with multiple threads (but not multiple processes) would cause and exception
