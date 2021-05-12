@@ -26,6 +26,7 @@ convert_from_path(
     grayscale=False,
     size=None,
     paths_only=False,
+    mono=False,
 )
 
 convert_from_bytes(
@@ -47,6 +48,7 @@ convert_from_bytes(
     grayscale=False,
     size=None,
     paths_only=False,
+    mono=False,
 )
 ```
 

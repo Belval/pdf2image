@@ -16,6 +16,7 @@ from PIL import Image
 from .generators import uuid_generator, counter_generator, ThreadSafeGenerator
 
 from .parsers import (
+    parse_buffer_to_pbm,
     parse_buffer_to_pgm,
     parse_buffer_to_ppm,
     parse_buffer_to_jpeg,
@@ -55,6 +56,7 @@ def convert_from_path(
     paths_only=False,
     use_pdftocairo=False,
     timeout=None,
+    mono=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -98,7 +100,7 @@ def convert_from_path(
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
     parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
-        fmt, grayscale
+        fmt, grayscale, mono
     )
 
     # We use pdftocairo is the format requires it OR we need a transparent output
@@ -170,6 +172,7 @@ def convert_from_path(
             single_file,
             grayscale,
             size,
+            mono
         )
 
         if use_pdfcairo:
@@ -241,6 +244,7 @@ def convert_from_bytes(
     paths_only=False,
     use_pdftocairo=False,
     timeout=None,
+    mono=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -293,6 +297,7 @@ def convert_from_bytes(
                 paths_only=paths_only,
                 use_pdftocairo=use_pdftocairo,
                 timeout=timeout,
+                mono=mono
             )
     finally:
         os.close(fh)
@@ -313,6 +318,7 @@ def _build_command(
     single_file,
     grayscale,
     size,
+    mono
 ):
     if use_cropbox:
         args.append("-cropbox")
@@ -326,7 +332,7 @@ def _build_command(
     if last_page is not None:
         args.extend(["-l", str(last_page)])
 
-    if fmt not in ["pgm", "ppm"]:
+    if fmt not in ["pgm", "ppm", "pbm"]:
         args.append("-" + fmt)
 
     if fmt in ["jpeg", "jpg"] and jpegopt:
@@ -343,6 +349,9 @@ def _build_command(
 
     if grayscale:
         args.append("-gray")
+
+    if mono:
+        args.append("-mono")
 
     if size is None:
         pass
@@ -365,7 +374,7 @@ def _build_command(
     return args
 
 
-def _parse_format(fmt, grayscale=False):
+def _parse_format(fmt, grayscale=False, mono=False):
     fmt = fmt.lower()
     if fmt[0] == ".":
         fmt = fmt[1:]
@@ -377,6 +386,8 @@ def _parse_format(fmt, grayscale=False):
         return "tiff", "tif", None, True
     if fmt == "ppm" and grayscale:
         return "pgm", "pgm", parse_buffer_to_pgm, False
+    if fmt == "ppm" and mono:
+        return "pbm", "pbm", parse_buffer_to_pbm, False
     # Unable to parse the format so we'll use the default
     return "ppm", "ppm", parse_buffer_to_ppm, False
 
