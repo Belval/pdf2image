@@ -157,7 +157,7 @@ optinal keywords:
 **hide_annotations**
 
 Hide link bounding boxes and other PDF annotations. This is only implemented in pdftoppm at the moment so it
-cannot be combined with pdftocario flags.
+cannot be combined with pdftocairo flags.
 
 ## Exceptions
 

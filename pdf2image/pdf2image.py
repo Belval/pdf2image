@@ -179,7 +179,7 @@ def convert_from_path(
 
         if use_pdfcairo:
             if hide_annotations:
-                raise NotImplementedError("Hide annotations flag not implemented in pdftocario.")
+                raise NotImplementedError("Hide annotations flag not implemented in pdftocairo.")
             args = [_get_command_path("pdftocairo", poppler_path)] + args
         else:
             args = [_get_command_path("pdftoppm", poppler_path)] + args
