@@ -26,6 +26,7 @@ convert_from_path(
     grayscale=False,
     size=None,
     paths_only=False,
+    hide_annotations=False,
 )
 
 convert_from_bytes(
@@ -47,6 +48,7 @@ convert_from_bytes(
     grayscale=False,
     size=None,
     paths_only=False,
+    hide_annotations=False,
 )
 ```
 
@@ -150,7 +152,12 @@ A list of image paths rather than preloaded images are returned.
 
 Provide additional options for jpeg format conversions. Requires `fmt="jpeg"` and is provided as dict, with all
 optinal keywords:
-`jpegopt={"quality": 100, "optimize": True, "progressive": False}
+`jpegopt={"quality": 100, "optimize": True, "progressive": False}`
+
+**hide_annotations**
+
+Hide link bounding boxes and other PDF annotations. This is only implemented in pdftoppm at the moment so it
+cannot be combined with pdftocario flags.
 
 ## Exceptions
 
