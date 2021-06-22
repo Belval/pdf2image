@@ -68,6 +68,7 @@ Here are the definitions:
 
 ## What's new?
 
+- Allow users to hide attributes when using pdftoppm with `hide_attributes` (Thank you @StaticRocket)
 - Fix console opening on Windows (Thank you @OhMyAgnes!)
 - Add `timeout` parameter which raises `PDFPopplerTimeoutError` after the given number of seconds.
 - Add `use_pdftocairo` parameter which forces `pdf2image` to use `pdftocairo`. Should improve performance.
@@ -82,7 +83,6 @@ Here are the definitions:
 - `grayscale` parameter allows you to convert images to grayscale (`-gray` in pdftoppm CLI)
 - `single_file` parameter allows you to convert the first PDF page only, without adding digits at the end of the `output_file`
 - Allow the user to specify poppler's installation path with `poppler_path`
-- Allow users to hide attributes when using pdftoppm with `hide_attributes`
 
 ## Performance tips
 
