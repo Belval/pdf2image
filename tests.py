@@ -1492,6 +1492,55 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    ## Test hide annotations parameter
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_hide_annotations(self):
+        images_from_path = convert_from_path("./tests/test_annotations.pdf", hide_annotations=True)
+        start_time = time.time()
+        self.assertTrue(len(images_from_path) == 1)
+        print(
+            "test_conversion_from_path_with_hide_annotations: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_bytes_with_hide_annotations(self):
+        start_time = time.time()
+        with open("./tests/test_annotations.pdf", "rb") as pdf_file:
+            images_from_bytes = convert_from_bytes(
+                pdf_file.read(),
+                hide_annotations=True,
+            )
+            self.assertTrue(len(images_from_bytes) == 1)
+        print(
+            "test_conversion_from_bytes_with_hide_annotations: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_from_path_with_hide_annotations_with_invalid_arg_combination(self):
+        start_time = time.time()
+        try:
+            images_from_path = convert_from_path(
+                "./tests/test_annotations.pdf",
+                hide_annotations=True,
+                use_pdftocairo=True,
+            )
+            raise Exception("This should not happen")
+        except NotImplementedError:
+            pass
+        print(
+            "test_conversion_from_path_with_hide_annotations_with_invalid_arg_combination: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
     ## Test pdfinfo
 
     @profile

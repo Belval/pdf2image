@@ -55,6 +55,7 @@ def convert_from_path(
     paths_only=False,
     use_pdftocairo=False,
     timeout=None,
+    hide_annotations=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -115,6 +116,9 @@ def convert_from_path(
     if poppler_version_major == 0 and poppler_version_minor <= 57:
         jpegopt = None
 
+    if poppler_version_major == 0 and poppler_version_minor <= 83:
+        hide_annotations = False
+
     # If output_file isn't a generator, it will be turned into one
     if not isinstance(output_file, types.GeneratorType) and not isinstance(
         output_file, ThreadSafeGenerator
@@ -170,9 +174,12 @@ def convert_from_path(
             single_file,
             grayscale,
             size,
+            hide_annotations,
         )
 
         if use_pdfcairo:
+            if hide_annotations:
+                raise NotImplementedError("Hide annotations flag not implemented in pdftocairo.")
             args = [_get_command_path("pdftocairo", poppler_path)] + args
         else:
             args = [_get_command_path("pdftoppm", poppler_path)] + args
@@ -241,6 +248,7 @@ def convert_from_bytes(
     paths_only=False,
     use_pdftocairo=False,
     timeout=None,
+    hide_annotations=False,
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -293,6 +301,7 @@ def convert_from_bytes(
                 paths_only=paths_only,
                 use_pdftocairo=use_pdftocairo,
                 timeout=timeout,
+                hide_annotations=hide_annotations,
             )
     finally:
         os.close(fh)
@@ -313,9 +322,13 @@ def _build_command(
     single_file,
     grayscale,
     size,
+    hide_annotations,
 ):
     if use_cropbox:
         args.append("-cropbox")
+
+    if hide_annotations:
+        args.append("-hide-annotations")
 
     if transparent and fmt in TRANSPARENT_FILE_TYPES:
         args.append("-transp")
