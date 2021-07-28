@@ -353,6 +353,7 @@ def _build_command(
 
     if userpw is not None:
         args.extend(["-upw", userpw])
+        args.extend(["-opw", userpw])
 
     if grayscale:
         args.append("-gray")
