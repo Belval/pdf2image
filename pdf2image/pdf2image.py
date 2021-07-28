@@ -448,6 +448,7 @@ def pdfinfo_from_path(
 
         if userpw is not None:
             command.extend(["-upw", userpw])
+            command.extend(["-opw", userpw])
 
         if rawdates:
             command.extend(["-rawdates"])
