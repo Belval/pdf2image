@@ -240,6 +240,7 @@ def convert_from_bytes(
     jpegopt=None,
     thread_count=1,
     userpw=None,
+    ownerpw=None,
     use_cropbox=False,
     strict=False,
     transparent=False,
@@ -265,6 +266,7 @@ def convert_from_bytes(
             jpegopt -> jpeg options `quality`, `progressive`, and `optimize` (only for jpeg format)
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
+            ownerpw -> PDF's owner password
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
@@ -293,6 +295,7 @@ def convert_from_bytes(
                 jpegopt=jpegopt,
                 thread_count=thread_count,
                 userpw=userpw,
+                ownerpw=ownerpw,
                 use_cropbox=use_cropbox,
                 strict=strict,
                 transparent=transparent,
