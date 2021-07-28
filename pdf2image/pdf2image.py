@@ -44,6 +44,7 @@ def convert_from_path(
     jpegopt=None,
     thread_count=1,
     userpw=None,
+    ownerpw=None,
     use_cropbox=False,
     strict=False,
     transparent=False,
@@ -69,6 +70,7 @@ def convert_from_path(
             jpegopt -> jpeg options `quality`, `progressive`, and `optimize` (only for jpeg format)
             thread_count -> How many threads we are allowed to spawn for processing
             userpw -> PDF's password
+            ownerpw -> PDF's owner password
             use_cropbox -> Use cropbox instead of mediabox
             strict -> When a Syntax Error is thrown, it will be raised as an Exception
             transparent -> Output with a transparent background instead of a white one.
@@ -95,7 +97,7 @@ def convert_from_path(
     if isinstance(poppler_path, pathlib.PurePath):
         poppler_path = poppler_path.as_posix()
 
-    page_count = pdfinfo_from_path(pdf_path, userpw, poppler_path=poppler_path)["Pages"]
+    page_count = pdfinfo_from_path(pdf_path, userpw, ownerpw, poppler_path=poppler_path)["Pages"]
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
     parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
@@ -169,6 +171,7 @@ def convert_from_path(
             jpegopt,
             thread_output_file,
             userpw,
+            ownerpw,
             use_cropbox,
             transparent,
             single_file,
@@ -317,6 +320,7 @@ def _build_command(
     jpegopt,
     output_file,
     userpw,
+    ownerpw,
     use_cropbox,
     transparent,
     single_file,
@@ -353,7 +357,9 @@ def _build_command(
 
     if userpw is not None:
         args.extend(["-upw", userpw])
-        args.extend(["-opw", userpw])
+
+    if ownerpw is not None:
+        args.extend(["-opw", ownerpw])
 
     if grayscale:
         args.append("-gray")
@@ -441,14 +447,16 @@ def _get_poppler_version(command, poppler_path=None, timeout=None):
 
 
 def pdfinfo_from_path(
-    pdf_path, userpw=None, poppler_path=None, rawdates=False, timeout=None
+    pdf_path, userpw=None, ownerpw=None, poppler_path=None, rawdates=False, timeout=None
 ):
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
         if userpw is not None:
             command.extend(["-upw", userpw])
-            command.extend(["-opw", userpw])
+
+        if ownerpw is not None:
+            command.extend(["-opw", ownerpw])
 
         if rawdates:
             command.extend(["-rawdates"])
@@ -493,15 +501,15 @@ def pdfinfo_from_path(
 
 
 def pdfinfo_from_bytes(
-    pdf_file, userpw=None, poppler_path=None, rawdates=False, timeout=None
+    pdf_file, userpw=None, ownerpw=None, poppler_path=None, rawdates=False, timeout=None
 ):
     fh, temp_filename = tempfile.mkstemp()
     try:
         with open(temp_filename, "wb") as f:
             f.write(pdf_file)
             f.flush()
-        return pdfinfo_from_path(temp_filename, userpw=userpw, rawdates=rawdates,
-                                 poppler_path=poppler_path)
+        return pdfinfo_from_path(temp_filename, userpw=userpw, ownerpw=ownerpw, 
+                                 rawdates=rawdates, poppler_path=poppler_path)
     finally:
         os.close(fh)
         os.remove(temp_filename)
