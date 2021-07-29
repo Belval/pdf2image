@@ -621,6 +621,23 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_locked_pdf_with_ownerpw_and_userpw_forgotten(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            with open("./tests/test_locked_both_user_forgotten.pdf", "rb") as pdf_file:
+                images_from_bytes = convert_from_bytes(
+                    pdf_file.read(), output_folder=path, fmt=".jpg", ownerpw="pdf2image"
+                )
+                self.assertTrue(len(images_from_bytes) == 1)
+                [im.close() for im in images_from_bytes]
+        print(
+            "test_locked_pdf_with_ownerpw_and_userpw_forgotten: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
     ## Tests cropbox
 
     @profile
