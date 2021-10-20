@@ -57,6 +57,7 @@ def convert_from_path(
     use_pdftocairo=False,
     timeout=None,
     hide_annotations=False,
+    max_image_pixels=Image.MAX_IMAGE_PIXELS
 ):
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
@@ -82,6 +83,7 @@ def convert_from_path(
             paths_only -> Don't load image(s), return paths instead (requires output_folder)
             use_pdftocairo -> Use pdftocairo instead of pdftoppm, may help performance
             timeout -> Raise PDFPopplerTimeoutError after the given time
+            max_image_size -> converted Image size limit - Raise PIL.Image.DecompressionBombError if converted image # of pixels is > limit. Use None for no limit on pixel size
     """
 
     if use_pdftocairo and fmt == "ppm":
@@ -98,7 +100,7 @@ def convert_from_path(
         poppler_path = poppler_path.as_posix()
 
     page_count = pdfinfo_from_path(pdf_path, userpw, ownerpw, poppler_path=poppler_path)["Pages"]
-
+    Image.MAX_IMAGE_PIXELS = max_image_pixels
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
     parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
         fmt, grayscale
@@ -511,7 +513,7 @@ def pdfinfo_from_bytes(
         with open(temp_filename, "wb") as f:
             f.write(pdf_file)
             f.flush()
-        return pdfinfo_from_path(temp_filename, userpw=userpw, ownerpw=ownerpw, 
+        return pdfinfo_from_path(temp_filename, userpw=userpw, ownerpw=ownerpw,
                                  rawdates=rawdates, poppler_path=poppler_path)
     finally:
         os.close(fh)
