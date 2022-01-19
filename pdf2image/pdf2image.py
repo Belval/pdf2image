@@ -142,90 +142,91 @@ def convert_from_path(
     if first_page > last_page:
         return []
 
-    auto_temp_dir = False
-    if output_folder is None and use_pdfcairo:
-        auto_temp_dir = True
-        output_folder = tempfile.mkdtemp()
+    try:
+        auto_temp_dir = False
+        if output_folder is None and use_pdfcairo:
+            auto_temp_dir = True
+            output_folder = tempfile.mkdtemp()
 
-    # Recalculate page count based on first and last page
-    page_count = last_page - first_page + 1
+        # Recalculate page count based on first and last page
+        page_count = last_page - first_page + 1
 
-    if thread_count > page_count:
-        thread_count = page_count
+        if thread_count > page_count:
+            thread_count = page_count
 
-    reminder = page_count % thread_count
-    current_page = first_page
-    processes = []
-    for _ in range(thread_count):
-        thread_output_file = next(output_file)
+        reminder = page_count % thread_count
+        current_page = first_page
+        processes = []
+        for _ in range(thread_count):
+            thread_output_file = next(output_file)
 
-        # Get the number of pages the thread will be processing
-        thread_page_count = page_count // thread_count + int(reminder > 0)
-        # Build the command accordingly
-        args = _build_command(
-            ["-r", str(dpi), pdf_path],
-            output_folder,
-            current_page,
-            current_page + thread_page_count - 1,
-            parsed_fmt,
-            jpegopt,
-            thread_output_file,
-            userpw,
-            ownerpw,
-            use_cropbox,
-            transparent,
-            single_file,
-            grayscale,
-            size,
-            hide_annotations,
-        )
-
-        if use_pdfcairo:
-            if hide_annotations:
-                raise NotImplementedError("Hide annotations flag not implemented in pdftocairo.")
-            args = [_get_command_path("pdftocairo", poppler_path)] + args
-        else:
-            args = [_get_command_path("pdftoppm", poppler_path)] + args
-
-        # Update page values
-        current_page = current_page + thread_page_count
-        reminder -= int(reminder > 0)
-        # Add poppler path to LD_LIBRARY_PATH
-        env = os.environ.copy()
-        if poppler_path is not None:
-            env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
-        # Spawn the process and save its uuid
-        startupinfo=None
-        if platform.system() == 'Windows':
-            # this startupinfo structure prevents a console window from popping up on Windows
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-        processes.append(
-            (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo))
-        )
-
-    images = []
-
-    for uid, proc in processes:
-        try:
-            data, err = proc.communicate(timeout=timeout)
-        except TimeoutExpired:
-            proc.kill()
-            outs, errs = proc.communicate()
-            raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
-
-        if b"Syntax Error" in err and strict:
-            raise PDFSyntaxError(err.decode("utf8", "ignore"))
-
-        if output_folder is not None:
-            images += _load_from_output_folder(
-                output_folder, uid, final_extension, paths_only, in_memory=auto_temp_dir
+            # Get the number of pages the thread will be processing
+            thread_page_count = page_count // thread_count + int(reminder > 0)
+            # Build the command accordingly
+            args = _build_command(
+                ["-r", str(dpi), pdf_path],
+                output_folder,
+                current_page,
+                current_page + thread_page_count - 1,
+                parsed_fmt,
+                jpegopt,
+                thread_output_file,
+                userpw,
+                ownerpw,
+                use_cropbox,
+                transparent,
+                single_file,
+                grayscale,
+                size,
+                hide_annotations,
             )
-        else:
-            images += parse_buffer_func(data)
 
-    if auto_temp_dir:
-        shutil.rmtree(output_folder)
+            if use_pdfcairo:
+                if hide_annotations:
+                    raise NotImplementedError("Hide annotations flag not implemented in pdftocairo.")
+                args = [_get_command_path("pdftocairo", poppler_path)] + args
+            else:
+                args = [_get_command_path("pdftoppm", poppler_path)] + args
+
+            # Update page values
+            current_page = current_page + thread_page_count
+            reminder -= int(reminder > 0)
+            # Add poppler path to LD_LIBRARY_PATH
+            env = os.environ.copy()
+            if poppler_path is not None:
+                env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
+            # Spawn the process and save its uuid
+            startupinfo=None
+            if platform.system() == 'Windows':
+                # this startupinfo structure prevents a console window from popping up on Windows
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            processes.append(
+                (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo))
+            )
+
+        images = []
+
+        for uid, proc in processes:
+            try:
+                data, err = proc.communicate(timeout=timeout)
+            except TimeoutExpired:
+                proc.kill()
+                outs, errs = proc.communicate()
+                raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
+
+            if b"Syntax Error" in err and strict:
+                raise PDFSyntaxError(err.decode("utf8", "ignore"))
+
+            if output_folder is not None:
+                images += _load_from_output_folder(
+                    output_folder, uid, final_extension, paths_only, in_memory=auto_temp_dir
+                )
+            else:
+                images += parse_buffer_func(data)
+    finally:
+        if auto_temp_dir:
+            shutil.rmtree(output_folder)
 
     return images
 
