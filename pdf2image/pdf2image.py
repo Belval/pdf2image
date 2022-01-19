@@ -145,8 +145,8 @@ def convert_from_path(
     try:
         auto_temp_dir = False
         if output_folder is None and use_pdfcairo:
-            auto_temp_dir = True
             output_folder = tempfile.mkdtemp()
+            auto_temp_dir = True
 
         # Recalculate page count based on first and last page
         page_count = last_page - first_page + 1
