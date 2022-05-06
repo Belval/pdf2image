@@ -13,7 +13,13 @@ Windows users will have to build or download poppler for Windows. I recommend [@
 
 ### Mac
 
-Mac users will have to install [poppler for Mac](http://macappstore.org/poppler/).
+Mac users will have to install [poppler](https://poppler.freedesktop.org/).
+
+Installing using [Brew](https://brew.sh/):
+
+```
+brew install poppler
+```
 
 ### Linux
 
