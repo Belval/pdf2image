@@ -213,7 +213,7 @@ def convert_from_path(
             except TimeoutExpired:
                 proc.kill()
                 outs, errs = proc.communicate()
-                raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
+                raise PDFPopplerTimeoutError("Run poppler timeout.")
 
             if b"Syntax Error" in err and strict:
                 raise PDFSyntaxError(err.decode("utf8", "ignore"))
