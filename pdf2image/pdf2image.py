@@ -384,7 +384,7 @@ def _build_command(
     elif isinstance(size, int) or isinstance(size, float):
         args.extend(["-scale-to", str(int(size))])
     else:
-        raise ValueError("Size {} is not a tuple or an integer")
+        raise ValueError("Size {} is not a tuple or an integer, it is {}".format(size, type(size)))
 
     return args
 
