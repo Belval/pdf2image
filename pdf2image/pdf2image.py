@@ -5,24 +5,26 @@
 
 import os
 import platform
+import posix
 import tempfile
 import types
 import shutil
-import pathlib
 import subprocess
 from subprocess import Popen, PIPE, TimeoutExpired
+from typing import Any, Union, Tuple, List, Dict, Callable
+from pathlib import PurePath
 from PIL import Image
 
-from .generators import uuid_generator, counter_generator, ThreadSafeGenerator
+from pdf2image.generators import uuid_generator, counter_generator, ThreadSafeGenerator
 
-from .parsers import (
+from pdf2image.parsers import (
     parse_buffer_to_pgm,
     parse_buffer_to_ppm,
     parse_buffer_to_jpeg,
     parse_buffer_to_png,
 )
 
-from .exceptions import (
+from pdf2image.exceptions import (
     PopplerNotInstalledError,
     PDFInfoNotInstalledError,
     PDFPageCountError,
@@ -35,29 +37,29 @@ PDFINFO_CONVERT_TO_INT = ["Pages"]
 
 
 def convert_from_path(
-    pdf_path,
-    dpi=200,
-    output_folder=None,
-    first_page=None,
-    last_page=None,
-    fmt="ppm",
-    jpegopt=None,
-    thread_count=1,
-    userpw=None,
-    ownerpw=None,
-    use_cropbox=False,
-    strict=False,
-    transparent=False,
-    single_file=False,
-    output_file=uuid_generator(),
-    poppler_path=None,
-    grayscale=False,
-    size=None,
-    paths_only=False,
-    use_pdftocairo=False,
-    timeout=None,
-    hide_annotations=False,
-):
+    pdf_path: Union[str, PurePath],
+    dpi: int = 200,
+    output_folder: Union[str, PurePath] = None,
+    first_page: int = None,
+    last_page: int = None,
+    fmt: str = "ppm",
+    jpegopt: dict = None,
+    thread_count: int = 1,
+    userpw: str = None,
+    ownerpw: str = None,
+    use_cropbox: bool = False,
+    strict: bool = False,
+    transparent: bool = False,
+    single_file: bool = False,
+    output_file: Any = uuid_generator(),
+    poppler_path: Union[str, PurePath] = None,
+    grayscale: bool = False,
+    size: Union[Tuple, int] = None,
+    paths_only: bool = False,
+    use_pdftocairo: bool = False,
+    timeout: int = None,
+    hide_annotations: bool = False,
+) -> List[Image.Image]:
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -88,13 +90,13 @@ def convert_from_path(
         fmt = "png"
 
     # We make sure that if passed arguments are Path objects, they're converted to strings
-    if isinstance(pdf_path, pathlib.PurePath):
+    if isinstance(pdf_path, PurePath):
         pdf_path = pdf_path.as_posix()
 
-    if isinstance(output_folder, pathlib.PurePath):
+    if isinstance(output_folder, PurePath):
         output_folder = output_folder.as_posix()
 
-    if isinstance(poppler_path, pathlib.PurePath):
+    if isinstance(poppler_path, PurePath):
         poppler_path = poppler_path.as_posix()
 
     page_count = pdfinfo_from_path(pdf_path, userpw, ownerpw, poppler_path=poppler_path)["Pages"]
@@ -232,29 +234,29 @@ def convert_from_path(
 
 
 def convert_from_bytes(
-    pdf_file,
-    dpi=200,
-    output_folder=None,
-    first_page=None,
-    last_page=None,
-    fmt="ppm",
-    jpegopt=None,
-    thread_count=1,
-    userpw=None,
-    ownerpw=None,
-    use_cropbox=False,
-    strict=False,
-    transparent=False,
-    single_file=False,
-    output_file=uuid_generator(),
-    poppler_path=None,
-    grayscale=False,
-    size=None,
-    paths_only=False,
-    use_pdftocairo=False,
-    timeout=None,
-    hide_annotations=False,
-):
+    pdf_file: bytes,
+    dpi: int = 200,
+    output_folder: Union[str, PurePath] = None,
+    first_page: int = None,
+    last_page: int = None,
+    fmt: str = "ppm",
+    jpegopt: dict = None,
+    thread_count: int = 1,
+    userpw: str = None,
+    ownerpw: str = None,
+    use_cropbox: bool = False,
+    strict: bool = False,
+    transparent: bool = False,
+    single_file: bool = False,
+    output_file: Union[str, PurePath] = uuid_generator(),
+    poppler_path: Union[str, PurePath] = None,
+    grayscale: bool = False,
+    size: Union[Tuple, int] = None,
+    paths_only: bool = False,
+    use_pdftocairo: bool = False,
+    timeout: int = None,
+    hide_annotations: bool = False,
+) -> List[Image.Image]:
     """
         Description: Convert PDF to Image will throw whenever one of the condition is reached
         Parameters:
@@ -316,22 +318,22 @@ def convert_from_bytes(
 
 
 def _build_command(
-    args,
-    output_folder,
-    first_page,
-    last_page,
-    fmt,
-    jpegopt,
-    output_file,
-    userpw,
-    ownerpw,
-    use_cropbox,
-    transparent,
-    single_file,
-    grayscale,
-    size,
-    hide_annotations,
-):
+    args: List,
+    output_folder: str,
+    first_page: int,
+    last_page: int,
+    fmt: str,
+    jpegopt: dict,
+    output_file: str,
+    userpw: str,
+    ownerpw: str,
+    use_cropbox: bool,
+    transparent: bool,
+    single_file: bool,
+    grayscale: bool,
+    size: Union[int, Tuple[int, int]],
+    hide_annotations: bool,
+) -> List[str]:
     if use_cropbox:
         args.append("-cropbox")
 
@@ -384,12 +386,12 @@ def _build_command(
     elif isinstance(size, int) or isinstance(size, float):
         args.extend(["-scale-to", str(int(size))])
     else:
-        raise ValueError("Size {} is not a tuple or an integer")
+        raise ValueError(f"Size {size} is not a tuple or an integer")
 
     return args
 
 
-def _parse_format(fmt, grayscale=False):
+def _parse_format(fmt: str, grayscale: bool = False) -> Tuple[str, str, Callable, bool]:
     fmt = fmt.lower()
     if fmt[0] == ".":
         fmt = fmt[1:]
@@ -405,7 +407,7 @@ def _parse_format(fmt, grayscale=False):
     return "ppm", "ppm", parse_buffer_to_ppm, False
 
 
-def _parse_jpegopt(jpegopt):
+def _parse_jpegopt(jpegopt: Dict) -> str:
     parts = []
     for k, v in jpegopt.items():
         if v is True:
@@ -416,7 +418,7 @@ def _parse_jpegopt(jpegopt):
     return ",".join(parts)
 
 
-def _get_command_path(command, poppler_path=None):
+def _get_command_path(command: str, poppler_path: str = None) -> str:
     if platform.system() == "Windows":
         command = command + ".exe"
 
@@ -426,7 +428,7 @@ def _get_command_path(command, poppler_path=None):
     return command
 
 
-def _get_poppler_version(command, poppler_path=None, timeout=None):
+def _get_poppler_version(command: str, poppler_path: str = None, timeout: int = None) -> Tuple[int, int]:
     command = [_get_command_path(command, poppler_path), "-v"]
 
     env = os.environ.copy()
@@ -451,8 +453,8 @@ def _get_poppler_version(command, poppler_path=None, timeout=None):
 
 
 def pdfinfo_from_path(
-    pdf_path, userpw=None, ownerpw=None, poppler_path=None, rawdates=False, timeout=None
-):
+    pdf_path: str, userpw: str = None, ownerpw: str = None, poppler_path: str = None, rawdates: bool = False, timeout: int = None
+) -> dict:
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
@@ -505,8 +507,8 @@ def pdfinfo_from_path(
 
 
 def pdfinfo_from_bytes(
-    pdf_file, userpw=None, ownerpw=None, poppler_path=None, rawdates=False, timeout=None
-):
+    pdf_file: str, userpw: str = None, ownerpw: str = None, poppler_path: str = None, rawdates: bool = False, timeout: int = None
+) -> Dict:
     fh, temp_filename = tempfile.mkstemp()
     try:
         with open(temp_filename, "wb") as f:
@@ -520,8 +522,8 @@ def pdfinfo_from_bytes(
 
 
 def _load_from_output_folder(
-    output_folder, output_file, ext, paths_only, in_memory=False
-):
+    output_folder: str, output_file: str, ext: str, paths_only: bool, in_memory: bool = False
+) -> List[Image.Image]:
     images = []
     for f in sorted(os.listdir(output_folder)):
         if f.startswith(output_file) and f.split(".")[-1] == ext:

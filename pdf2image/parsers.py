@@ -3,11 +3,12 @@
 """
 
 from io import BytesIO
+from typing import List
 
 from PIL import Image
 
 
-def parse_buffer_to_ppm(data):
+def parse_buffer_to_ppm(data: bytes) -> List[Image.Image]:
     """Parse PPM file bytes to Pillow Image"""
 
     images = []
@@ -24,7 +25,7 @@ def parse_buffer_to_ppm(data):
     return images
 
 
-def parse_buffer_to_pgm(data):
+def parse_buffer_to_pgm(data: bytes) -> List[Image.Image]:
     """Parse PGM file bytes to Pillow Image"""
 
     images = []
@@ -41,7 +42,7 @@ def parse_buffer_to_pgm(data):
     return images
 
 
-def parse_buffer_to_jpeg(data):
+def parse_buffer_to_jpeg(data: bytes) -> List[Image.Image]:
     """Parse JPEG file bytes to Pillow Image"""
 
     return [
@@ -52,7 +53,7 @@ def parse_buffer_to_jpeg(data):
     ]
 
 
-def parse_buffer_to_png(data):
+def parse_buffer_to_png(data: bytes) -> List[Image.Image]:
     """Parse PNG file bytes to Pillow Image"""
 
     images = []
