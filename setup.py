@@ -12,7 +12,7 @@ with open(path.join(here, "README.md"), encoding="utf-8") as f:
 
 setup(
     name="pdf2image",
-    version="1.16.0",
+    version="1.16.1",
     description="A wrapper around the pdftoppm and pdftocairo command line tools to convert PDF to a PIL Image list.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -30,10 +30,10 @@ setup(
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
     keywords="pdf image png jpeg jpg convert",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),

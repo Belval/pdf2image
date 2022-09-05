@@ -3,12 +3,19 @@
 """
 
 from io import BytesIO
+from typing import List
 
 from PIL import Image
 
 
-def parse_buffer_to_ppm(data):
-    """Parse PPM file bytes to Pillow Image"""
+def parse_buffer_to_ppm(data: bytes) -> List[Image.Image]:
+    """Parse PPM file bytes to Pillow Image
+
+    :param data: pdftoppm/pdftocairo output bytes
+    :type data: bytes
+    :return: List of PPM images parsed from the output
+    :rtype: List[Image.Image]
+    """
 
     images = []
 
@@ -24,8 +31,14 @@ def parse_buffer_to_ppm(data):
     return images
 
 
-def parse_buffer_to_pgm(data):
-    """Parse PGM file bytes to Pillow Image"""
+def parse_buffer_to_pgm(data: bytes) -> List[Image.Image]:
+    """Parse PGM file bytes to Pillow Image
+
+    :param data: pdftoppm/pdftocairo output bytes
+    :type data: bytes
+    :return: List of PGM images parsed from the output
+    :rtype: List[Image.Image]
+    """
 
     images = []
 
@@ -41,8 +54,14 @@ def parse_buffer_to_pgm(data):
     return images
 
 
-def parse_buffer_to_jpeg(data):
-    """Parse JPEG file bytes to Pillow Image"""
+def parse_buffer_to_jpeg(data: bytes) -> List[Image.Image]:
+    """Parse JPEG file bytes to Pillow Image
+
+    :param data: pdftoppm/pdftocairo output bytes
+    :type data: bytes
+    :return: List of JPEG images parsed from the output
+    :rtype: List[Image.Image]
+    """
 
     return [
         Image.open(BytesIO(image_data + b"\xff\xd9"))
@@ -52,8 +71,14 @@ def parse_buffer_to_jpeg(data):
     ]
 
 
-def parse_buffer_to_png(data):
-    """Parse PNG file bytes to Pillow Image"""
+def parse_buffer_to_png(data: bytes) -> List[Image.Image]:
+    """Parse PNG file bytes to Pillow Image
+
+    :param data: pdftoppm/pdftocairo output bytes
+    :type data: bytes
+    :return: List of PNG images parsed from the output
+    :rtype: List[Image.Image]
+    """
 
     images = []
 

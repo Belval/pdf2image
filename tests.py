@@ -30,7 +30,7 @@ from pdf2image.exceptions import (
 
 from functools import wraps
 
-PROFILE_MEMORY = os.environ.get('PROFILE_MEMORY', False)
+PROFILE_MEMORY = os.environ.get("PROFILE_MEMORY", False)
 
 try:
     subprocess.call(
@@ -1514,7 +1514,9 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_hide_annotations(self):
-        images_from_path = convert_from_path("./tests/test_annotations.pdf", hide_annotations=True)
+        images_from_path = convert_from_path(
+            "./tests/test_annotations.pdf", hide_annotations=True
+        )
         start_time = time.time()
         self.assertTrue(len(images_from_path) == 1)
         print(
@@ -1541,7 +1543,9 @@ class PDFConversionMethods(unittest.TestCase):
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
-    def test_conversion_from_path_with_hide_annotations_with_invalid_arg_combination(self):
+    def test_conversion_from_path_with_hide_annotations_with_invalid_arg_combination(
+        self,
+    ):
         start_time = time.time()
         try:
             images_from_path = convert_from_path(
@@ -1640,7 +1644,9 @@ class PDFConversionMethods(unittest.TestCase):
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed")
     def test_multithread_conversion(self):
         start_time = time.time()
-        files = ["./tests/test.pdf",] * 50
+        files = [
+            "./tests/test.pdf",
+        ] * 50
         with Pool(10) as p:
             res = p.map(convert_from_path, files)
         self.assertTrue(len(res) == 50)
@@ -1677,9 +1683,7 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         info = pdfinfo_from_path("./tests/test.pdf", rawdates=True)
         self.assertTrue("D:" in info["CreationDate"])
-        print(
-            "test_pdfinfo_rawdates: {} sec".format(time.time() - start_time)
-        )
+        print("test_pdfinfo_rawdates: {} sec".format(time.time() - start_time))
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1687,12 +1691,12 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with TemporaryDirectory() as path:
             with open("./tests/test_locked_user_only.pdf", "rb") as pdf_file:
-                info = pdfinfo_from_bytes(
-                    pdf_file.read(), userpw="pdf2image"
-                )
+                info = pdfinfo_from_bytes(pdf_file.read(), userpw="pdf2image")
                 self.assertTrue("CreationDate" in info)
         print(
-            "test_pdfinfo_locked_pdf_with_userpw_only: {} sec".format(time.time() - start_time)
+            "test_pdfinfo_locked_pdf_with_userpw_only: {} sec".format(
+                time.time() - start_time
+            )
         )
 
     @profile
@@ -1702,7 +1706,11 @@ class PDFConversionMethods(unittest.TestCase):
             len(signature(convert_from_path).parameters),
             len(signature(convert_from_bytes).parameters),
         )
-        print("test_convert_from_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
+        print(
+            "test_convert_from_functions_same_number_of_parameters: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     def test_pdfinfo_functions_same_number_of_parameters(self):
@@ -1711,14 +1719,22 @@ class PDFConversionMethods(unittest.TestCase):
             len(signature(pdfinfo_from_path).parameters),
             len(signature(pdfinfo_from_bytes).parameters),
         )
-        print("test_pdfinfo_functions_same_number_of_parameters: {} sec".format(time.time() - start_time))
-    
+        print(
+            "test_pdfinfo_functions_same_number_of_parameters: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_timeout_pdfinfo_from_path_241(self):
         start_time = time.time()
         with self.assertRaises(PDFPopplerTimeoutError):
             info = pdfinfo_from_path("./tests/test_241.pdf", timeout=0.00001)
-        print("test_timeout_pdfinfo_from_path_241: {} sec".format(time.time() - start_time))
+        print(
+            "test_timeout_pdfinfo_from_path_241: {} sec".format(
+                time.time() - start_time
+            )
+        )
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1726,7 +1742,12 @@ class PDFConversionMethods(unittest.TestCase):
         start_time = time.time()
         with self.assertRaises(PDFPopplerTimeoutError):
             imgs = convert_from_path("./tests/test_241.pdf", timeout=1)
-        print("test_timeout_convert_from_path_241: {} sec".format(time.time() - start_time))
+        print(
+            "test_timeout_convert_from_path_241: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

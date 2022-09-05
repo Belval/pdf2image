@@ -15,4 +15,5 @@ If you are new to the project, start with the installation section!
 
    installation
    overview
+   known_issues
    reference
