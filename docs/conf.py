@@ -23,7 +23,7 @@ copyright = "2022, Edouard Belval"
 author = "Edouard Belval"
 
 # The short X.Y version
-version = "1.17"
+version = "1.16.1"
 # The full version, including alpha/beta/rc tags
 release = "latest"
 
