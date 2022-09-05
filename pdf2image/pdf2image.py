@@ -25,7 +25,6 @@ from pdf2image.parsers import (
 )
 
 from pdf2image.exceptions import (
-    PopplerNotInstalledError,
     PDFInfoNotInstalledError,
     PDFPageCountError,
     PDFSyntaxError,
@@ -43,7 +42,7 @@ def convert_from_path(
     first_page: int = None,
     last_page: int = None,
     fmt: str = "ppm",
-    jpegopt: dict = None,
+    jpegopt: Dict = None,
     thread_count: int = 1,
     userpw: str = None,
     ownerpw: str = None,
@@ -240,7 +239,7 @@ def convert_from_bytes(
     first_page: int = None,
     last_page: int = None,
     fmt: str = "ppm",
-    jpegopt: dict = None,
+    jpegopt: Dict = None,
     thread_count: int = 1,
     userpw: str = None,
     ownerpw: str = None,
@@ -323,7 +322,7 @@ def _build_command(
     first_page: int,
     last_page: int,
     fmt: str,
-    jpegopt: dict,
+    jpegopt: Dict,
     output_file: str,
     userpw: str,
     ownerpw: str,
@@ -454,7 +453,7 @@ def _get_poppler_version(command: str, poppler_path: str = None, timeout: int = 
 
 def pdfinfo_from_path(
     pdf_path: str, userpw: str = None, ownerpw: str = None, poppler_path: str = None, rawdates: bool = False, timeout: int = None
-) -> dict:
+) -> Dict:
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
