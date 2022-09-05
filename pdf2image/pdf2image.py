@@ -125,7 +125,9 @@ def convert_from_path(
     if isinstance(poppler_path, PurePath):
         poppler_path = poppler_path.as_posix()
 
-    page_count = pdfinfo_from_path(pdf_path, userpw, ownerpw, poppler_path=poppler_path)["Pages"]
+    page_count = pdfinfo_from_path(
+        pdf_path, userpw, ownerpw, poppler_path=poppler_path
+    )["Pages"]
 
     # We start by getting the output format, the buffer processing function and if we need pdftocairo
     parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
@@ -211,7 +213,9 @@ def convert_from_path(
 
             if use_pdfcairo:
                 if hide_annotations:
-                    raise NotImplementedError("Hide annotations flag not implemented in pdftocairo.")
+                    raise NotImplementedError(
+                        "Hide annotations flag not implemented in pdftocairo."
+                    )
                 args = [_get_command_path("pdftocairo", poppler_path)] + args
             else:
                 args = [_get_command_path("pdftoppm", poppler_path)] + args
@@ -222,15 +226,22 @@ def convert_from_path(
             # Add poppler path to LD_LIBRARY_PATH
             env = os.environ.copy()
             if poppler_path is not None:
-                env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
+                env["LD_LIBRARY_PATH"] = (
+                    poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
+                )
             # Spawn the process and save its uuid
-            startupinfo=None
-            if platform.system() == 'Windows':
+            startupinfo = None
+            if platform.system() == "Windows":
                 # this startupinfo structure prevents a console window from popping up on Windows
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
             processes.append(
-                (thread_output_file, Popen(args, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo))
+                (
+                    thread_output_file,
+                    Popen(
+                        args, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo
+                    ),
+                )
             )
 
         images = []
@@ -248,7 +259,11 @@ def convert_from_path(
 
             if output_folder is not None:
                 images += _load_from_output_folder(
-                    output_folder, uid, final_extension, paths_only, in_memory=auto_temp_dir
+                    output_folder,
+                    uid,
+                    final_extension,
+                    paths_only,
+                    in_memory=auto_temp_dir,
                 )
             else:
                 images += parse_buffer_func(data)
@@ -481,7 +496,9 @@ def _get_command_path(command: str, poppler_path: str = None) -> str:
     return command
 
 
-def _get_poppler_version(command: str, poppler_path: str = None, timeout: int = None) -> Tuple[int, int]:
+def _get_poppler_version(
+    command: str, poppler_path: str = None, timeout: int = None
+) -> Tuple[int, int]:
     command = [_get_command_path(command, poppler_path), "-v"]
 
     env = os.environ.copy()
@@ -506,7 +523,12 @@ def _get_poppler_version(command: str, poppler_path: str = None, timeout: int = 
 
 
 def pdfinfo_from_path(
-    pdf_path: str, userpw: str = None, ownerpw: str = None, poppler_path: str = None, rawdates: bool = False, timeout: int = None
+    pdf_path: str,
+    userpw: str = None,
+    ownerpw: str = None,
+    poppler_path: str = None,
+    rawdates: bool = False,
+    timeout: int = None,
 ) -> Dict:
     """Function wrapping poppler's pdfinfo utility and returns the result as a dictionary.
 
@@ -574,11 +596,18 @@ def pdfinfo_from_path(
             "Unable to get page count. Is poppler installed and in PATH?"
         )
     except ValueError:
-        raise PDFPageCountError(f"Unable to get page count.\n{err.decode('utf8', 'ignore')}")
+        raise PDFPageCountError(
+            f"Unable to get page count.\n{err.decode('utf8', 'ignore')}"
+        )
 
 
 def pdfinfo_from_bytes(
-    pdf_bytes: bytes, userpw: str = None, ownerpw: str = None, poppler_path: str = None, rawdates: bool = False, timeout: int = None
+    pdf_bytes: bytes,
+    userpw: str = None,
+    ownerpw: str = None,
+    poppler_path: str = None,
+    rawdates: bool = False,
+    timeout: int = None,
 ) -> Dict:
     """Function wrapping poppler's pdfinfo utility and returns the result as a dictionary.
 
@@ -602,15 +631,24 @@ def pdfinfo_from_bytes(
         with open(temp_filename, "wb") as f:
             f.write(pdf_bytes)
             f.flush()
-        return pdfinfo_from_path(temp_filename, userpw=userpw, ownerpw=ownerpw, 
-                                 rawdates=rawdates, poppler_path=poppler_path)
+        return pdfinfo_from_path(
+            temp_filename,
+            userpw=userpw,
+            ownerpw=ownerpw,
+            rawdates=rawdates,
+            poppler_path=poppler_path,
+        )
     finally:
         os.close(fh)
         os.remove(temp_filename)
 
 
 def _load_from_output_folder(
-    output_folder: str, output_file: str, ext: str, paths_only: bool, in_memory: bool = False
+    output_folder: str,
+    output_file: str,
+    ext: str,
+    paths_only: bool,
+    in_memory: bool = False,
 ) -> List[Image.Image]:
     images = []
     for f in sorted(os.listdir(output_folder)):
