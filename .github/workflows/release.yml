@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ["Main release"]
+    types: [completed]
+
+  workflow_dispatch:
+
+# Package and upload the Python package
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out the repository
+      - uses: actions/checkout@v3
+        with:
+          ref: 'master'
+
+      # Upgrade pip
+      - name: Upgrade pip
+        run: |
+          # install pip=>20.1 to use "pip cache dir"
+          python3 -m pip install --upgrade pip
+      
+      # Install twine
+      - name: Install dependencies
+        run: python3 -m pip install twine
+
+      # Make docs
+      - name: Build sdist and wheels
+        run: |
+          python3 setup.py bdist_wheel
+          python3 setup.py sdist
+
+      # Upload to PyPI
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_KEY_PDF2IMAGE }}
