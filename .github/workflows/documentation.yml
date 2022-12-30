@@ -1,0 +1,47 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ 'master' ]
+  pull_request:
+
+  workflow_dispatch:
+
+# Compile the docs and deploy to GitHub pages
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks out the repository
+      - uses: actions/checkout@v3
+        with:
+          ref: 'master'
+
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
+
+      # Upgrade pip
+      - name: Upgrade pip
+        run: |
+          # install pip=>20.1 to use "pip cache dir"
+          python3 -m pip install --upgrade pip
+      # Cache dependencies
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "::set-output name=dir::$(pip cache dir)"
+
+      # Install sphinx
+      - name: Install dependencies
+        run: python3 -m pip install -r ./docs/requirements.txt
+
+      # Make docs
+      - name: Build docs
+        run: cd docs && make html
+        
+      # Deploy
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/_build/html/

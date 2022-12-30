@@ -1,0 +1,12 @@
+recommonmark
+sphinx-rtd-theme==1.0.0
+Sphinx==5.1.*
+nbsphinx==0.8.*
+sphinx-rtd-theme==1.0.*
+sphinx-argparse
+sphinxcontrib-applehelp==1.0.*
+sphinxcontrib-devhelp==1.0.*
+sphinxcontrib-htmlhelp==2.0.*
+sphinxcontrib-jsmath==1.0.*
+sphinxcontrib-qthelp==1.0.*
+sphinxcontrib-serializinghtml==1.1.*
