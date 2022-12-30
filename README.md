@@ -1,5 +1,5 @@
 # pdf2image
-[![CircleCI](https://circleci.com/gh/Belval/pdf2image/tree/master.svg?style=svg)](https://circleci.com/gh/Belval/pdf2image/tree/master) [![PyPI version](https://badge.fury.io/py/pdf2image.svg)](https://badge.fury.io/py/pdf2image) [![codecov](https://codecov.io/gh/Belval/pdf2image/branch/master/graph/badge.svg)](https://codecov.io/gh/Belval/pdf2image) [![Downloads](https://pepy.tech/badge/pdf2image/month)](https://pepy.tech/project/pdf2image) [![Documentation Status](https://readthedocs.org/projects/pdf2image/badge/?version=latest)](https://pdf2image.readthedocs.io/en/latest/?badge=latest)
+[![CircleCI](https://circleci.com/gh/Belval/pdf2image/tree/master.svg?style=svg)](https://circleci.com/gh/Belval/pdf2image/tree/master) [![PyPI version](https://badge.fury.io/py/pdf2image.svg)](https://badge.fury.io/py/pdf2image) [![codecov](https://codecov.io/gh/Belval/pdf2image/branch/master/graph/badge.svg)](https://codecov.io/gh/Belval/pdf2image) [![Downloads](https://pepy.tech/badge/pdf2image/month)](https://pepy.tech/project/pdf2image) [![GitHub CI](https://github.com/Belval/pdf2image/actions/workflows/documentation.yml/badge.svg)](https://belval.github.io/pdf2image)
 
 A python (3.7+) module that wraps pdftoppm and pdftocairo to convert PDF to a PIL Image object
 

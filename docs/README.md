@@ -2,4 +2,4 @@
 
 Documentation for the pdf2image module
 
-See: https://pdf2image.readthedocs.io/en/latest/
+See: https://belval.github.io/pdf2image
