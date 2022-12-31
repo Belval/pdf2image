@@ -5,7 +5,6 @@
 
 import os
 import platform
-import posix
 import tempfile
 import types
 import shutil
@@ -635,8 +634,9 @@ def pdfinfo_from_bytes(
             temp_filename,
             userpw=userpw,
             ownerpw=ownerpw,
-            rawdates=rawdates,
             poppler_path=poppler_path,
+            rawdates=rawdates,
+            timeout=timeout,
         )
     finally:
         os.close(fh)
