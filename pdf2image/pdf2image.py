@@ -528,7 +528,8 @@ def pdfinfo_from_path(
     poppler_path: str = None,
     rawdates: bool = False,
     timeout: int = None,
-) -> Dict:
+    urls: bool = False,
+) -> Union[Dict, List]:
     """Function wrapping poppler's pdfinfo utility and returns the result as a dictionary.
 
     :param pdf_path: Path to the PDF that you want to convert
@@ -543,6 +544,8 @@ def pdfinfo_from_path(
     :type rawdates: bool, optional
     :param timeout: Raise PDFPopplerTimeoutError after the given time, defaults to None
     :type timeout: int, optional
+    :param urls: Find all the embedded URLs, defaults to False. Replaces normal output with URLs.
+    :type urls: bool, optional
     :raises PDFPopplerTimeoutError: Raised after the timeout for the image processing is exceeded
     :raises PDFInfoNotInstalledError: Raised if pdfinfo is not installed
     :raises PDFPageCountError: Raised if the output could not be parsed
@@ -561,6 +564,9 @@ def pdfinfo_from_path(
         if rawdates:
             command.extend(["-rawdates"])
 
+        if urls:
+            command.extend(["-url"])
+
         # Add poppler path to LD_LIBRARY_PATH
         env = os.environ.copy()
         if poppler_path is not None:
@@ -573,6 +579,18 @@ def pdfinfo_from_path(
             proc.kill()
             outs, errs = proc.communicate()
             raise PDFPopplerTimeoutError("Run poppler poppler timeout.")
+
+        if urls:
+            url_list = []
+            lines = out.decode("utf8", "ignore").split("\n")
+            assert lines[0].split() == ["Page", "Type", "URL"]
+            for line in lines[1:]:
+                if line == "":
+                    continue
+                page, type, url = line.split()
+                page = int(page)
+                url_list.append((page, type, url))
+            return url_list
 
         d = {}
         for field in out.decode("utf8", "ignore").split("\n"):
