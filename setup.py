@@ -38,4 +38,5 @@ setup(
     keywords="pdf image png jpeg jpg convert",
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
     install_requires=["pillow"],
+    package_data={"pdf2image": ["py.typed"]},
 )
