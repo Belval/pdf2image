@@ -2,7 +2,6 @@ import os
 import sys
 import errno
 import pathlib
-import tempfile
 import unittest
 import time
 import shutil
@@ -467,7 +466,7 @@ class PDFConversionMethods(unittest.TestCase):
             images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="jpg")
             self.assertTrue(images_from_bytes[0].format == "JPEG")
         print(
-            "test_conversion_to_jpeg_from_bytes_14: {} sec".format(
+            "test_conversion_to_jpeg_from_bytes: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
@@ -483,7 +482,7 @@ class PDFConversionMethods(unittest.TestCase):
             self.assertTrue(images_from_path[0].format == "JPEG")
             [im.close() for im in images_from_path]
         print(
-            "test_conversion_to_jpeg_from_path_using_dir_14: {} sec".format(
+            "test_conversion_to_jpeg_from_path_using_dir: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
@@ -498,7 +497,7 @@ class PDFConversionMethods(unittest.TestCase):
             images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="png")
             self.assertTrue(images_from_bytes[0].format == "PNG")
         print(
-            "test_conversion_to_png_from_bytes_14: {} sec".format(
+            "test_conversion_to_png_from_bytes: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )
@@ -514,7 +513,38 @@ class PDFConversionMethods(unittest.TestCase):
             self.assertTrue(images_from_path[0].format == "PNG")
             [im.close() for im in images_from_path]
         print(
-            "test_conversion_to_png_from_path_using_dir_14: {} sec".format(
+            "test_conversion_to_png_from_path_using_dir: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
+    ## Test output as webp
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_webp_from_bytes(self):
+        start_time = time.time()
+        with open("./tests/test.pdf", "rb") as pdf_file:
+            images_from_bytes = convert_from_bytes(pdf_file.read(), fmt="webp")
+            self.assertTrue(images_from_bytes[0].format == "WEBP")
+        print(
+            "test_conversion_to_webp_from_bytes: {} sec".format(
+                (time.time() - start_time) / 14.0
+            )
+        )
+
+    @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_conversion_to_webp_from_path_using_dir(self):
+        start_time = time.time()
+        with TemporaryDirectory() as path:
+            images_from_path = convert_from_path(
+                "./tests/test.pdf", output_folder=path, fmt="webp"
+            )
+            self.assertTrue(images_from_path[0].format == "WEBP")
+            [im.close() for im in images_from_path]
+        print(
+            "test_conversion_to_webp_from_path_using_dir: {} sec".format(
                 (time.time() - start_time) / 14.0
             )
         )

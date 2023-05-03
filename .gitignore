@@ -102,3 +102,9 @@ ENV/
 
 # Ignore my vscode config
 .vscode/
+
+# Ignore MacOS thumbnails
+.DS_Store
+
+# Ignore PyCharm files
+.idea

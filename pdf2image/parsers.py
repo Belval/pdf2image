@@ -1,9 +1,10 @@
 """
     pdf2image custom buffer parsers
 """
-
+import os
+import tempfile
 from io import BytesIO
-from typing import List
+from typing import List, Tuple
 
 from PIL import Image
 
@@ -22,10 +23,10 @@ def parse_buffer_to_ppm(data: bytes) -> List[Image.Image]:
     index = 0
 
     while index < len(data):
-        code, size, rgb = tuple(data[index : index + 40].split(b"\n")[0:3])
+        code, size, rgb = _parse_ppm_pgm_buffer(data, index)
         size_x, size_y = tuple(size.split(b" "))
         file_size = len(code) + len(size) + len(rgb) + 3 + int(size_x) * int(size_y) * 3
-        images.append(Image.open(BytesIO(data[index : index + file_size])))
+        images.append(Image.open(BytesIO(data[index: index + file_size])))
         index += file_size
 
     return images
@@ -45,10 +46,10 @@ def parse_buffer_to_pgm(data: bytes) -> List[Image.Image]:
     index = 0
 
     while index < len(data):
-        code, size, maxval = tuple(data[index : index + 40].split(b"\n")[0:3])
+        code, size, maxval = _parse_ppm_pgm_buffer(data, index)
         size_x, size_y = tuple(size.split(b" "))
         file_size = len(code) + len(size) + len(maxval) + 3 + int(size_x) * int(size_y)
-        images.append(Image.open(BytesIO(data[index : index + file_size])))
+        images.append(Image.open(BytesIO(data[index: index + file_size])))
         index += file_size
 
     return images
@@ -87,12 +88,48 @@ def parse_buffer_to_png(data: bytes) -> List[Image.Image]:
     data_len = len(data)
     while c1 < data_len:
         # IEND can appear in a PNG without being the actual end
-        if data[c2 : c2 + 4] == b"IEND" and (
-            c2 + 8 == data_len or data[c2 + 9 : c2 + 12] == b"PNG"
+        if data[c2: c2 + 4] == b"IEND" and (
+            c2 + 8 == data_len or data[c2 + 9: c2 + 12] == b"PNG"
         ):
-            images.append(Image.open(BytesIO(data[c1 : c2 + 8])))
+            images.append(Image.open(BytesIO(data[c1: c2 + 8])))
             c1 = c2 + 8
             c2 = c1
         c2 += 1
 
     return images
+
+
+def parse_buffer_to_webp(data: bytes) -> List[Image.Image]:
+    """Parse WebP file bytes to Pillow Image
+
+    :param data: pdftoppm/pdftocairo output bytes
+    :type data: bytes
+    :return: List of WebP images parsed from the output
+    :rtype: List[Image.Image]
+    """
+    images = []
+
+    c1 = c2 = 0
+    data_len = len(data)
+
+    while c1 < data_len:
+        # IEND can appear in a PNG without being the actual end
+        if data[c2: c2 + 4] == b"IEND" and (
+            c2 + 8 == data_len or data[c2 + 9: c2 + 12] == b"PNG"
+        ):
+            cur_image = Image.open(BytesIO(data[c1: c2 + 8]))
+            c1 = c2 + 8
+            c2 = c1
+
+            _, temp_filename = tempfile.mkstemp()
+            cur_image.save(temp_filename, format='webp')
+            images.append(Image.open(temp_filename))
+            os.remove(temp_filename)
+
+        c2 += 1
+
+    return images
+
+
+def _parse_ppm_pgm_buffer(data: bytes, index: int) -> tuple[bytes, ...]:
+    return tuple(data[index: index + 40].split(b"\n")[0:3])

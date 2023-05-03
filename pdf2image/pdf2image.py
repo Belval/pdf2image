@@ -21,6 +21,7 @@ from pdf2image.parsers import (
     parse_buffer_to_ppm,
     parse_buffer_to_jpeg,
     parse_buffer_to_png,
+    parse_buffer_to_webp
 )
 
 from pdf2image.exceptions import (
@@ -464,14 +465,16 @@ def _parse_format(fmt: str, grayscale: bool = False) -> Tuple[str, str, Callable
         fmt = fmt[1:]
     if fmt in ("jpeg", "jpg"):
         return "jpeg", "jpg", parse_buffer_to_jpeg, False
-    if fmt == "png":
+    elif fmt == "png":
         return "png", "png", parse_buffer_to_png, False
-    if fmt in ("tif", "tiff"):
-        return "tiff", "tif", None, True
-    if fmt == "ppm" and grayscale:
+    elif fmt in ("tif", "tiff"):
+        return "tiff", "tif", lambda _: None, True
+    elif fmt == "ppm" and grayscale:
         return "pgm", "pgm", parse_buffer_to_pgm, False
-    # Unable to parse the format so we'll use the default
-    return "ppm", "ppm", parse_buffer_to_ppm, False
+    elif fmt == "webp":
+        return "png", "webp", parse_buffer_to_webp, False
+    else:  # Unable to parse the format, so we'll use the default
+        return "ppm", "ppm", parse_buffer_to_ppm, False
 
 
 def _parse_jpegopt(jpegopt: Dict) -> str:
