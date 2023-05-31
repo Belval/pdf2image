@@ -11,7 +11,6 @@ from inspect import signature
 from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 from multiprocessing.dummy import Pool
-from memory_profiler import profile as profile_memory
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -31,6 +30,8 @@ from pdf2image.exceptions import (
 from functools import wraps
 
 PROFILE_MEMORY = os.environ.get("PROFILE_MEMORY", False)
+if PROFILE_MEMORY:
+    from memory_profiler import profile as profile_memory
 
 try:
     subprocess.call(
