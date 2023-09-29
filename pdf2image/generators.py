@@ -42,5 +42,8 @@ def counter_generator(prefix="", suffix="", padding_goal=4):
     """Returns a joined prefix, iteration number, and suffix"""
     i = 0
     while True:
-        i += 1
-        yield str(prefix) + str(i).zfill(padding_goal) + str(suffix)
+        if padding_goal<1:
+            yield str(prefix) + str(suffix)
+        else:
+            i += 1
+            yield str(prefix) + str(i).zfill(padding_goal) + str(suffix)
