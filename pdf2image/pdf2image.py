@@ -528,6 +528,8 @@ def pdfinfo_from_path(
     poppler_path: str = None,
     rawdates: bool = False,
     timeout: int = None,
+    first_page: int = None,
+    last_page: int = None,
 ) -> Dict:
     """Function wrapping poppler's pdfinfo utility and returns the result as a dictionary.
 
@@ -543,6 +545,10 @@ def pdfinfo_from_path(
     :type rawdates: bool, optional
     :param timeout: Raise PDFPopplerTimeoutError after the given time, defaults to None
     :type timeout: int, optional
+    :param first_page: First page to process, defaults to None
+    :type first_page: int, optional
+    :param last_page: Last page to process before stopping, defaults to None
+    :type last_page: int, optional
     :raises PDFPopplerTimeoutError: Raised after the timeout for the image processing is exceeded
     :raises PDFInfoNotInstalledError: Raised if pdfinfo is not installed
     :raises PDFPageCountError: Raised if the output could not be parsed
@@ -560,6 +566,12 @@ def pdfinfo_from_path(
 
         if rawdates:
             command.extend(["-rawdates"])
+
+        if first_page:
+            command.extend(["-f", first_page])
+
+        if last_page:
+            command.extend(["-l", last_page])
 
         # Add poppler path to LD_LIBRARY_PATH
         env = os.environ.copy()
@@ -607,6 +619,8 @@ def pdfinfo_from_bytes(
     poppler_path: str = None,
     rawdates: bool = False,
     timeout: int = None,
+    first_page: int = None,
+    last_page: int = None,
 ) -> Dict:
     """Function wrapping poppler's pdfinfo utility and returns the result as a dictionary.
 
@@ -622,6 +636,10 @@ def pdfinfo_from_bytes(
     :type rawdates: bool, optional
     :param timeout: Raise PDFPopplerTimeoutError after the given time, defaults to None
     :type timeout: int, optional
+    :param first_page: First page to process, defaults to None
+    :type first_page: int, optional
+    :param last_page: Last page to process before stopping, defaults to None
+    :type last_page: int, optional
     :return: Dictionary containing various information on the PDF
     :rtype: Dict
     """
@@ -637,6 +655,8 @@ def pdfinfo_from_bytes(
             poppler_path=poppler_path,
             rawdates=rawdates,
             timeout=timeout,
+            first_page=first_page,
+            last_page=last_page,
         )
     finally:
         os.close(fh)
