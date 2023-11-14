@@ -568,10 +568,10 @@ def pdfinfo_from_path(
             command.extend(["-rawdates"])
 
         if first_page:
-            command.extend(["-f", first_page])
+            command.extend(["-f", str(first_page)])
 
         if last_page:
-            command.extend(["-l", last_page])
+            command.extend(["-l", str(last_page)])
 
         # Add poppler path to LD_LIBRARY_PATH
         env = os.environ.copy()
