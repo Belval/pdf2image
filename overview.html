@@ -82,7 +82,7 @@
 
 <span class="c1"># OR</span>
 
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/home/user/example.pdf&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/home/user/example.pdf&quot;</span><span class="p">,</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span>
     <span class="n">images</span> <span class="o">=</span> <span class="n">convert_from_bytes</span><span class="p">(</span><span class="n">pdf</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
 </pre></div>
 </div>
