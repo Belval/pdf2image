@@ -156,6 +156,7 @@ def convert_from_path(
     ):
         if single_file:
             output_file = iter([output_file])
+            thread_count = 1
         else:
             output_file = counter_generator(output_file)
 
