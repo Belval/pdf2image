@@ -32,9 +32,9 @@ Most distros ship with `pdftoppm` and `pdftocairo`. If they are not installed, r
 
 ## How does it work?
 
-`from pdf2image import convert_from_path, convert_from_bytes`
 
 ```py
+from pdf2image import convert_from_path, convert_from_bytes
 from pdf2image.exceptions import (
     PDFInfoNotInstalledError,
     PDFPageCountError,
