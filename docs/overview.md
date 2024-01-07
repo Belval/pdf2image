@@ -11,7 +11,7 @@ images = convert_from_path("/home/user/example.pdf")
 
 # OR
 
-with open("/home/user/example.pdf") as pdf:
+with open("/home/user/example.pdf","rb") as pdf:
     images = convert_from_bytes(pdf.read())
 ```
 
