@@ -1750,6 +1750,7 @@ class PDFConversionMethods(unittest.TestCase):
         )
 
     @profile
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_pdfinfo_first_and_last_page(self):
         start_time = time.time()
         info_first_path = pdfinfo_from_path("./tests/test_14.pdf", first_page=1, last_page=2)
