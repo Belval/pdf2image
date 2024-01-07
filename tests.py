@@ -1749,6 +1749,19 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    @profile
+    def test_pdfinfo_first_and_last_page(self):
+        start_time = time.time()
+        info_first_path = pdfinfo_from_path("./tests/test_14.pdf", first_page=1, last_page=2)
+
+        self.assertIn("Page    1 rot", info_first_path)
+
+        print(
+            "test_pdfinfo_first_and_last_page: {} sec".format(
+                time.time() - start_time
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
