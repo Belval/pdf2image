@@ -50,6 +50,8 @@ def convert_from_path(
     transparent: bool = False,
     single_file: bool = False,
     output_file: Any = uuid_generator(),
+    padding_goal: int = 4,
+    sep: str = "-",
     poppler_path: Union[str, PurePath] = None,
     grayscale: bool = False,
     size: Union[Tuple, int] = None,
@@ -90,6 +92,10 @@ def convert_from_path(
     :type single_file: bool, optional
     :param output_file: What is the output filename or generator, defaults to uuid_generator()
     :type output_file: Any, optional
+    :param padding_goal: Number of digits to pad after the given output_file, defaults to 4
+    :type padding_goal: int, optional
+    :param sep: Single character separator between name and page number, default -
+    :type sep: str, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
     :type poppler_path: Union[str, PurePath], optional
     :param grayscale: Output grayscale image(s), defaults to False
@@ -110,6 +116,10 @@ def convert_from_path(
     :return: A list of Pillow images, one for each page between first_page and last_page
     :rtype: List[Image.Image]
     """
+
+    #don't let the user abuse the padding
+    if padding_goal>4:
+        padding_goal=4
 
     if use_pdftocairo and fmt == "ppm":
         fmt = "png"
@@ -158,7 +168,7 @@ def convert_from_path(
             output_file = iter([output_file])
             thread_count = 1
         else:
-            output_file = counter_generator(output_file)
+            output_file = counter_generator(output_file, "", padding_goal)
 
     if thread_count < 1:
         thread_count = 1
@@ -201,6 +211,7 @@ def convert_from_path(
                 parsed_fmt,
                 jpegopt,
                 thread_output_file,
+                sep,
                 userpw,
                 ownerpw,
                 use_cropbox,
@@ -393,6 +404,7 @@ def _build_command(
     fmt: str,
     jpegopt: Dict,
     output_file: str,
+    sep: str,
     userpw: str,
     ownerpw: str,
     use_cropbox: bool,
@@ -437,6 +449,8 @@ def _build_command(
 
     if grayscale:
         args.append("-gray")
+
+    args.extend(["-sep", sep])
 
     if size is None:
         pass
