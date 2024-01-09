@@ -235,6 +235,7 @@ def convert_from_path(
                 # this startupinfo structure prevents a console window from popping up on Windows
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                startupinfo.wShowWindow = subprocess.SW_HIDE
             processes.append(
                 (
                     thread_output_file,
@@ -504,7 +505,14 @@ def _get_poppler_version(
     env = os.environ.copy()
     if poppler_path is not None:
         env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
-    proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+
+    startupinfo = None
+    if platform.system() == "Windows":
+        # this startupinfo structure prevents a console window from popping up on Windows
+        startupinfo = subprocess.STARTUPINFO()
+        startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        startupinfo.wShowWindow = subprocess.SW_HIDE
+    proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo)
 
     try:
         data, err = proc.communicate(timeout=timeout)
@@ -578,7 +586,16 @@ def pdfinfo_from_path(
         env = os.environ.copy()
         if poppler_path is not None:
             env["LD_LIBRARY_PATH"] = poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
-        proc = Popen(command, env=env, stdout=PIPE, stderr=PIPE)
+
+        startupinfo = None
+        if platform.system() == "Windows":
+            # this startupinfo structure prevents a console window from popping up on Windows
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            startupinfo.wShowWindow = subprocess.SW_HIDE
+        proc = Popen(
+            command, env=env, stdout=PIPE, stderr=PIPE, startupinfo=startupinfo
+        )
 
         try:
             out, err = proc.communicate(timeout=timeout)
