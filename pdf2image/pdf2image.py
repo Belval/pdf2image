@@ -184,14 +184,14 @@ def convert_from_path(
         if thread_count > page_count:
             thread_count = page_count
 
-        reminder = page_count % thread_count
+        remainder = page_count % thread_count
         current_page = first_page
         processes = []
         for _ in range(thread_count):
             thread_output_file = next(output_file)
 
             # Get the number of pages the thread will be processing
-            thread_page_count = page_count // thread_count + int(reminder > 0)
+            thread_page_count = page_count // thread_count + int(remainder > 0)
             # Build the command accordingly
             args = _build_command(
                 ["-r", str(dpi), pdf_path],
@@ -222,7 +222,7 @@ def convert_from_path(
 
             # Update page values
             current_page = current_page + thread_page_count
-            reminder -= int(reminder > 0)
+            remainder -= int(remainder > 0)
             # Add poppler path to LD_LIBRARY_PATH
             env = os.environ.copy()
             if poppler_path is not None:
