@@ -677,7 +677,9 @@ def _load_from_output_folder(
             if paths_only:
                 images.append(os.path.join(output_folder, f))
             else:
-                images.append(Image.open(os.path.join(output_folder, f)))
+                #images.append(Image.open(os.path.join(output_folder, f)))
+                with Image.open(os.path.join(output_folder, f)) as image:
+                    images.append(image)    
                 if in_memory:
                     images[-1].load()
     return images
