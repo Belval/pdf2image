@@ -189,7 +189,9 @@ def convert_from_path(
         processes = []
         for _ in range(thread_count):
             thread_output_file = next(output_file)
-
+            # Create subdirs under output_folder if thread_output_file is like `a/b/c.png`
+            os.makedirs(os.path.join(output_folder, PurePath(thread_output_file).parent), exist_ok=True)
+            
             # Get the number of pages the thread will be processing
             thread_page_count = page_count // thread_count + int(reminder > 0)
             # Build the command accordingly
