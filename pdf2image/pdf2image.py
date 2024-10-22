@@ -35,86 +35,58 @@ PDFINFO_CONVERT_TO_INT = ["Pages"]
 
 
 def convert_from_path(
-    pdf_path: Union[str, PurePath],
-    dpi: int = 200,
-    output_folder: Union[str, PurePath] = None,
-    first_page: int = None,
-    last_page: int = None,
-    fmt: str = "ppm",
-    jpegopt: Dict = None,
-    thread_count: int = 1,
-    userpw: str = None,
-    ownerpw: str = None,
-    use_cropbox: bool = False,
-    strict: bool = False,
-    transparent: bool = False,
-    single_file: bool = False,
-    output_file: Any = uuid_generator(),
-    poppler_path: Union[str, PurePath] = None,
-    grayscale: bool = False,
-    size: Union[Tuple, int] = None,
-    paths_only: bool = False,
-    use_pdftocairo: bool = False,
-    timeout: int = None,
-    hide_annotations: bool = False,
+        pdf_path: Union[str, PurePath],
+        dpi: int = 200,
+        output_folder: Union[str, PurePath] = None,
+        first_page: int = None,
+        last_page: int = None,
+        fmt: str = "ppm",
+        jpegopt: Dict = None,
+        thread_count: int = 1,
+        userpw: str = None,
+        ownerpw: str = None,
+        use_cropbox: bool = False,
+        strict: bool = False,
+        transparent: bool = False,
+        single_file: bool = False,
+        output_file: Any = uuid_generator(),
+        poppler_path: Union[str, PurePath] = None,
+        grayscale: bool = False,
+        size: Union[Tuple, int] = None,
+        paths_only: bool = False,
+        use_pdftocairo: bool = False,
+        timeout: int = None,
+        hide_annotations: bool = False,
+        page_indexes: List[int] = None  # 允许指定要转换的特定页面
 ) -> List[Image.Image]:
-    """Function wrapping pdftoppm and pdftocairo
+    """Function wrapping pdftoppm and pdftocairo, allowing page selection by indexes."""
 
-    :param pdf_path: Path to the PDF that you want to convert
-    :type pdf_path: Union[str, PurePath]
-    :param dpi: Image quality in DPI (default 200), defaults to 200
-    :type dpi: int, optional
-    :param output_folder: Write the resulting images to a folder (instead of directly in memory), defaults to None
-    :type output_folder: Union[str, PurePath], optional
-    :param first_page: First page to process, defaults to None
-    :type first_page: int, optional
-    :param last_page: Last page to process before stopping, defaults to None
-    :type last_page: int, optional
-    :param fmt: Output image format, defaults to "ppm"
-    :type fmt: str, optional
-    :param jpegopt: jpeg options `quality`, `progressive`, and `optimize` (only for jpeg format), defaults to None
-    :type jpegopt: Dict, optional
-    :param thread_count: How many threads we are allowed to spawn for processing, defaults to 1
-    :type thread_count: int, optional
-    :param userpw: PDF's password, defaults to None
-    :type userpw: str, optional
-    :param ownerpw: PDF's owner password, defaults to None
-    :type ownerpw: str, optional
-    :param use_cropbox: Use cropbox instead of mediabox, defaults to False
-    :type use_cropbox: bool, optional
-    :param strict: When a Syntax Error is thrown, it will be raised as an Exception, defaults to False
-    :type strict: bool, optional
-    :param transparent: Output with a transparent background instead of a white one, defaults to False
-    :type transparent: bool, optional
-    :param single_file: Uses the -singlefile option from pdftoppm/pdftocairo, defaults to False
-    :type single_file: bool, optional
-    :param output_file: What is the output filename or generator, defaults to uuid_generator()
-    :type output_file: Any, optional
-    :param poppler_path: Path to look for poppler binaries, defaults to None
-    :type poppler_path: Union[str, PurePath], optional
-    :param grayscale: Output grayscale image(s), defaults to False
-    :type grayscale: bool, optional
-    :param size: Size of the resulting image(s), uses the Pillow (width, height) standard, defaults to None
-    :type size: Union[Tuple, int], optional
-    :param paths_only: Don't load image(s), return paths instead (requires output_folder), defaults to False
-    :type paths_only: bool, optional
-    :param use_pdftocairo: Use pdftocairo instead of pdftoppm, may help performance, defaults to False
-    :type use_pdftocairo: bool, optional
-    :param timeout: Raise PDFPopplerTimeoutError after the given time, defaults to None
-    :type timeout: int, optional
-    :param hide_annotations: Hide PDF annotations in the output, defaults to False
-    :type hide_annotations: bool, optional
-    :raises NotImplementedError: Raised when conflicting parameters are given (hide_annotations for pdftocairo)
-    :raises PDFPopplerTimeoutError: Raised after the timeout for the image processing is exceeded
-    :raises PDFSyntaxError: Raised if there is a syntax error in the PDF and strict=True
-    :return: A list of Pillow images, one for each page between first_page and last_page
-    :rtype: List[Image.Image]
-    """
+    # 如果指定了 page_indexes 参数，我们需要重新调整 first_page 和 last_page
+    if page_indexes is not None:
+        page_indexes = sorted(set(page_indexes))  # 排序并去重
+        first_page = page_indexes[0]
+        last_page = page_indexes[-1]
 
+    # 验证页面范围
+    if first_page is None or first_page < 1:
+        first_page = 1
+
+    # 获取总页数
+    page_count = pdfinfo_from_path(
+        pdf_path, userpw, ownerpw, poppler_path=poppler_path
+    )["Pages"]
+
+    if last_page is None or last_page > page_count:
+        last_page = page_count
+
+    if first_page > last_page:
+        return []
+
+    # 确定使用的转换工具
     if use_pdftocairo and fmt == "ppm":
         fmt = "png"
 
-    # We make sure that if passed arguments are Path objects, they're converted to strings
+    # 如果传递的是 PurePath 对象，转换为字符串
     if isinstance(pdf_path, PurePath):
         pdf_path = pdf_path.as_posix()
 
@@ -124,53 +96,22 @@ def convert_from_path(
     if isinstance(poppler_path, PurePath):
         poppler_path = poppler_path.as_posix()
 
-    page_count = pdfinfo_from_path(
-        pdf_path, userpw, ownerpw, poppler_path=poppler_path
-    )["Pages"]
-
-    # We start by getting the output format, the buffer processing function and if we need pdftocairo
     parsed_fmt, final_extension, parse_buffer_func, use_pdfcairo_format = _parse_format(
         fmt, grayscale
     )
 
-    # We use pdftocairo is the format requires it OR we need a transparent output
     use_pdfcairo = (
-        use_pdftocairo
-        or use_pdfcairo_format
-        or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
+            use_pdftocairo
+            or use_pdfcairo_format
+            or (transparent and parsed_fmt in TRANSPARENT_FILE_TYPES)
     )
 
-    poppler_version_major, poppler_version_minor = _get_poppler_version(
-        "pdftocairo" if use_pdfcairo else "pdftoppm", poppler_path=poppler_path
-    )
+    # 如果线程数超过页面数，则限制线程数
+    if thread_count > len(page_indexes) if page_indexes else (last_page - first_page + 1):
+        thread_count = len(page_indexes) if page_indexes else (last_page - first_page + 1)
 
-    if poppler_version_major == 0 and poppler_version_minor <= 57:
-        jpegopt = None
-
-    if poppler_version_major == 0 and poppler_version_minor <= 83:
-        hide_annotations = False
-
-    # If output_file isn't a generator, it will be turned into one
-    if not isinstance(output_file, types.GeneratorType) and not isinstance(
-        output_file, ThreadSafeGenerator
-    ):
-        if single_file:
-            output_file = iter([output_file])
-            thread_count = 1
-        else:
-            output_file = counter_generator(output_file)
-
-    if thread_count < 1:
-        thread_count = 1
-
-    if first_page is None or first_page < 1:
-        first_page = 1
-
-    if last_page is None or last_page > page_count:
-        last_page = page_count
-
-    if first_page > last_page:
-        return []
+    processes = []
+    images = []
 
     try:
         auto_temp_dir = False
@@ -178,26 +119,28 @@ def convert_from_path(
             output_folder = tempfile.mkdtemp()
             auto_temp_dir = True
 
-        # Recalculate page count based on first and last page
-        page_count = last_page - first_page + 1
-
-        if thread_count > page_count:
-            thread_count = page_count
-
-        reminder = page_count % thread_count
-        current_page = first_page
-        processes = []
-        for _ in range(thread_count):
+        # 多线程处理
+        for i in range(thread_count):
             thread_output_file = next(output_file)
 
-            # Get the number of pages the thread will be processing
-            thread_page_count = page_count // thread_count + int(reminder > 0)
-            # Build the command accordingly
+            # 获取该线程应处理的页面范围
+            if page_indexes is not None:
+                pages_to_process = page_indexes[i::thread_count]  # 均匀分配页面到每个线程
+            else:
+                pages_to_process = list(range(first_page + i, last_page + 1, thread_count))
+
+            if not pages_to_process:
+                continue
+
+            first_page_in_thread = pages_to_process[0]
+            last_page_in_thread = pages_to_process[-1]
+
+            # 构建命令
             args = _build_command(
                 ["-r", str(dpi), pdf_path],
                 output_folder,
-                current_page,
-                current_page + thread_page_count - 1,
+                first_page_in_thread,
+                last_page_in_thread,
                 parsed_fmt,
                 jpegopt,
                 thread_output_file,
@@ -220,21 +163,18 @@ def convert_from_path(
             else:
                 args = [_get_command_path("pdftoppm", poppler_path)] + args
 
-            # Update page values
-            current_page = current_page + thread_page_count
-            reminder -= int(reminder > 0)
             # Add poppler path to LD_LIBRARY_PATH
             env = os.environ.copy()
             if poppler_path is not None:
                 env["LD_LIBRARY_PATH"] = (
-                    poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
+                        poppler_path + ":" + env.get("LD_LIBRARY_PATH", "")
                 )
-            # Spawn the process and save its uuid
             startupinfo = None
             if platform.system() == "Windows":
-                # this startupinfo structure prevents a console window from popping up on Windows
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+            # 启动进程
             processes.append(
                 (
                     thread_output_file,
@@ -244,8 +184,7 @@ def convert_from_path(
                 )
             )
 
-        images = []
-
+        # 等待所有进程完成并收集结果
         for uid, proc in processes:
             try:
                 data, err = proc.communicate(timeout=timeout)
