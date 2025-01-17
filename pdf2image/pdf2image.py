@@ -10,7 +10,7 @@ import types
 import shutil
 import subprocess
 from subprocess import Popen, PIPE, TimeoutExpired
-from typing import Any, Union, Tuple, List, Dict, Callable
+from typing import Any, Union, Tuple, List, Dict, Callable, Optional
 from pathlib import PurePath
 from PIL import Image
 
@@ -50,7 +50,7 @@ def convert_from_path(
     transparent: bool = False,
     single_file: bool = False,
     output_file: Any = uuid_generator(),
-    poppler_path: Union[str, PurePath] = None,
+    poppler_path: Optional[Union[str, PurePath]] = None,
     grayscale: bool = False,
     size: Union[Tuple, int] = None,
     paths_only: bool = False,
@@ -91,7 +91,7 @@ def convert_from_path(
     :param output_file: What is the output filename or generator, defaults to uuid_generator()
     :type output_file: Any, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
-    :type poppler_path: Union[str, PurePath], optional
+    :type poppler_path: Optional[Union[str, PurePath]]
     :param grayscale: Output grayscale image(s), defaults to False
     :type grayscale: bool, optional
     :param size: Size of the resulting image(s), uses the Pillow (width, height) standard, defaults to None
@@ -290,7 +290,7 @@ def convert_from_bytes(
     transparent: bool = False,
     single_file: bool = False,
     output_file: Union[str, PurePath] = uuid_generator(),
-    poppler_path: Union[str, PurePath] = None,
+    poppler_path: Optional[Union[str, PurePath]] = None,
     grayscale: bool = False,
     size: Union[Tuple, int] = None,
     paths_only: bool = False,
@@ -331,7 +331,7 @@ def convert_from_bytes(
     :param output_file: What is the output filename or generator, defaults to uuid_generator()
     :type output_file: Any, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
-    :type poppler_path: Union[str, PurePath], optional
+    :type poppler_path: Optional[Union[str, PurePath]]
     :param grayscale: Output grayscale image(s), defaults to False
     :type grayscale: bool, optional
     :param size: Size of the resulting image(s), uses the Pillow (width, height) standard, defaults to None
@@ -486,7 +486,7 @@ def _parse_jpegopt(jpegopt: Dict) -> str:
     return ",".join(parts)
 
 
-def _get_command_path(command: str, poppler_path: str = None) -> str:
+def _get_command_path(command: str, poppler_path: Optional[Union[str, PurePath]] = None) -> str:
     if platform.system() == "Windows":
         command = command + ".exe"
 
@@ -497,7 +497,7 @@ def _get_command_path(command: str, poppler_path: str = None) -> str:
 
 
 def _get_poppler_version(
-    command: str, poppler_path: str = None, timeout: int = None
+    command: str, poppler_path: Optional[Union[str, PurePath]] = None, timeout: int = None
 ) -> Tuple[int, int]:
     command = [_get_command_path(command, poppler_path), "-v"]
 
@@ -526,7 +526,7 @@ def pdfinfo_from_path(
     pdf_path: str,
     userpw: str = None,
     ownerpw: str = None,
-    poppler_path: str = None,
+    poppler_path: Optional[Union[str, PurePath]] = None,
     rawdates: bool = False,
     timeout: int = None,
     first_page: int = None,
@@ -541,7 +541,7 @@ def pdfinfo_from_path(
     :param ownerpw: PDF's owner password, defaults to None
     :type ownerpw: str, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
-    :type poppler_path: Union[str, PurePath], optional
+    :type poppler_path: Optional[Union[str, PurePath]]
     :param rawdates: Return the undecoded data strings, defaults to False
     :type rawdates: bool, optional
     :param timeout: Raise PDFPopplerTimeoutError after the given time, defaults to None
@@ -617,7 +617,7 @@ def pdfinfo_from_bytes(
     pdf_bytes: bytes,
     userpw: str = None,
     ownerpw: str = None,
-    poppler_path: str = None,
+    poppler_path: Optional[Union[str, PurePath]] = None,
     rawdates: bool = False,
     timeout: int = None,
     first_page: int = None,
@@ -632,7 +632,7 @@ def pdfinfo_from_bytes(
     :param ownerpw: PDF's owner password, defaults to None
     :type ownerpw: str, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
-    :type poppler_path: Union[str, PurePath], optional
+    :type poppler_path: Optional[Union[str, PurePath]]
     :param rawdates: Return the undecoded data strings, defaults to False
     :type rawdates: bool, optional
     :param timeout: Raise PDFPopplerTimeoutError after the given time, defaults to None
