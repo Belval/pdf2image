@@ -9,7 +9,7 @@ A python (3.7+) module that wraps pdftoppm and pdftocairo to convert PDF to a PI
 
 ### Windows
 
-Windows users will have to build or download poppler for Windows. I recommend [@oschwartz10612 version](https://github.com/oschwartz10612/poppler-windows/releases/) which is the most up-to-date. You will then have to add the `bin/` folder to [PATH](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) or use `poppler_path = r"C:\path\to\poppler-xx\bin" as an argument` in `convert_from_path`.
+Windows users will have to build or download poppler for Windows. I recommend [@oschwartz10612 version](https://github.com/oschwartz10612/poppler-windows/releases/) which is the most up-to-date. You will then have to add the `bin/` folder to [PATH](https://www.architectryan.com/2018/03/17/add-to-the-path-on-windows-10/) or use `poppler_path=r"C:\path\to\poppler-xx\bin"' as an argument in `convert_from_path`.
 
 ### Mac
 
@@ -78,7 +78,7 @@ Here are the definitions:
 - Fix console opening on Windows (Thank you @OhMyAgnes!)
 - Add `timeout` parameter which raises `PDFPopplerTimeoutError` after the given number of seconds.
 - Add `use_pdftocairo` parameter which forces `pdf2image` to use `pdftocairo`. Should improve performance.
-- Fixed a bug where using `pdf2image` with multiple threads (but not multiple processes) would cause and exception
+- Fixed a bug where using `pdf2image` with multiple threads (but not multiple processes) would cause an exception
 - `jpegopt` parameter allows for tuning of the output JPEG when using `fmt="jpeg"` (`-jpegopt` in pdftoppm CLI) (Thank you @abieler)
 - `pdfinfo_from_path` and `pdfinfo_from_bytes` which expose the output of the pdfinfo CLI
 - `paths_only` parameter will return image paths instead of Image objects, to prevent OOM when converting a big PDF
