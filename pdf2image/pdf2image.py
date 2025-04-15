@@ -51,6 +51,7 @@ def convert_from_path(
     single_file: bool = False,
     output_file: Any = uuid_generator(),
     poppler_path: Union[str, PurePath] = None,
+    monochrome: bool = False,
     grayscale: bool = False,
     size: Union[Tuple, int] = None,
     paths_only: bool = False,
@@ -92,6 +93,8 @@ def convert_from_path(
     :type output_file: Any, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
     :type poppler_path: Union[str, PurePath], optional
+    :param monochrome: Output monochrome image(s), defaults to False
+    :type monochrome: bool, optional
     :param grayscale: Output grayscale image(s), defaults to False
     :type grayscale: bool, optional
     :param size: Size of the resulting image(s), uses the Pillow (width, height) standard, defaults to None
@@ -206,6 +209,7 @@ def convert_from_path(
                 use_cropbox,
                 transparent,
                 single_file,
+                monochrome,
                 grayscale,
                 size,
                 hide_annotations,
@@ -291,6 +295,7 @@ def convert_from_bytes(
     single_file: bool = False,
     output_file: Union[str, PurePath] = uuid_generator(),
     poppler_path: Union[str, PurePath] = None,
+    monochrome: bool = False,
     grayscale: bool = False,
     size: Union[Tuple, int] = None,
     paths_only: bool = False,
@@ -332,6 +337,8 @@ def convert_from_bytes(
     :type output_file: Any, optional
     :param poppler_path: Path to look for poppler binaries, defaults to None
     :type poppler_path: Union[str, PurePath], optional
+    :param monochrome: Output monochrome image(s), defaults to False
+    :type monochrome: bool, optional
     :param grayscale: Output grayscale image(s), defaults to False
     :type grayscale: bool, optional
     :param size: Size of the resulting image(s), uses the Pillow (width, height) standard, defaults to None
@@ -373,6 +380,7 @@ def convert_from_bytes(
                 single_file=single_file,
                 output_file=output_file,
                 poppler_path=poppler_path,
+                monochrome=monochrome,
                 grayscale=grayscale,
                 size=size,
                 paths_only=paths_only,
@@ -398,6 +406,7 @@ def _build_command(
     use_cropbox: bool,
     transparent: bool,
     single_file: bool,
+    monochrome: bool,
     grayscale: bool,
     size: Union[int, Tuple[int, int]],
     hide_annotations: bool,
@@ -434,6 +443,9 @@ def _build_command(
 
     if ownerpw is not None:
         args.extend(["-opw", ownerpw])
+
+    if monochrome:
+        args.append("-mono")
 
     if grayscale:
         args.append("-gray")
