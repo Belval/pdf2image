@@ -68,9 +68,9 @@ with tempfile.TemporaryDirectory() as path:
 
 Here are the definitions:
 
-`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', jpegopt=None, thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False, size=None, paths_only=False, use_pdftocairo=False, timeout=600, hide_attributes=False)`
+`convert_from_path(pdf_path, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', jpegopt=None, thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, monochrome=False, grayscale=False, size=None, paths_only=False, use_pdftocairo=False, timeout=600, hide_attributes=False)`
 
-`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', jpegopt=None, thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, grayscale=False, size=None, paths_only=False, use_pdftocairo=False, timeout=600, hide_attributes=False)`
+`convert_from_bytes(pdf_file, dpi=200, output_folder=None, first_page=None, last_page=None, fmt='ppm', jpegopt=None, thread_count=1, userpw=None, use_cropbox=False, strict=False, transparent=False, single_file=False, output_file=str(uuid.uuid4()), poppler_path=None, monochrome=False, grayscale=False, size=None, paths_only=False, use_pdftocairo=False, timeout=600, hide_attributes=False)`
 
 ## What's new?
 
@@ -86,6 +86,7 @@ Here are the definitions:
     - `size=400` will fit the image to a 400x400 box, preserving aspect ratio
     - `size=(400, None)` will make the image 400 pixels wide, preserving aspect ratio
     - `size=(500, 500)` will resize the image to 500x500 pixels, not preserving aspect ratio
+- `monochrome` parameter allows you to convert images to monochrome (`-mono` in pdftoppm CLI)
 - `grayscale` parameter allows you to convert images to grayscale (`-gray` in pdftoppm CLI)
 - `single_file` parameter allows you to convert the first PDF page only, without adding digits at the end of the `output_file`
 - Allow the user to specify poppler's installation path with `poppler_path`
