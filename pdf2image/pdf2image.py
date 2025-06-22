@@ -556,6 +556,11 @@ def pdfinfo_from_path(
     :return: Dictionary containing various information on the PDF
     :rtype: Dict
     """
+
+    # Validate PDF path exists before proceeding
+    if not os.path.exists(pdf_path):
+        raise OSError(f"PDF file not found: {pdf_path}")
+
     try:
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
