@@ -70,6 +70,31 @@ def get_poppler_path():
 
 
 class PDFConversionMethods(unittest.TestCase):
+    @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_hyphen_prefixed_pdf_paths(self):
+        source = os.path.abspath("./tests/test.pdf")
+        cwd = os.getcwd()
+        with TemporaryDirectory() as directory:
+            shutil.copyfile(source, os.path.join(directory, "-v"))
+            try:
+                os.chdir(directory)
+                for path in ("-v", "./-v", pathlib.Path("-v")):
+                    with self.subTest(path=path, operation="pdfinfo"):
+                        self.assertEqual(pdfinfo_from_path(path)["Pages"], 1)
+                    for use_pdftocairo in (False, True):
+                        with self.subTest(path=path, use_pdftocairo=use_pdftocairo):
+                            images = convert_from_path(
+                                path, dpi=30, use_pdftocairo=use_pdftocairo
+                            )
+                            try:
+                                self.assertEqual(len(images), 1)
+                                self.assertGreater(images[0].width, 0)
+                            finally:
+                                for image in images:
+                                    image.close()
+            finally:
+                os.chdir(cwd)
+
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes(self):
