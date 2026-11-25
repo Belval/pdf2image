@@ -38,13 +38,13 @@ jobs:
       - run:
           name: Run tests
           # This assumes pytest is installed via the install-package step above
-          command: CIRCLECI=true python3 tests.py && coverage run tests.py
+          command: CIRCLECI=true python3 tests.py && coverage run -m unittest discover
       - run:
           name: Uninstall poppler
           command: sudo apt remove poppler-utils
       - run:
           name: Run tests without poppler
-          command: coverage run -a tests.py
+          command: coverage run -a -m unittest discover
       - run:
           name: Upload report
           command: codecov

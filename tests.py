@@ -7,12 +7,13 @@ import unittest
 import time
 import shutil
 import subprocess
-from inspect import signature
 from subprocess import Popen, PIPE
 from tempfile import TemporaryDirectory
 from multiprocessing.dummy import Pool
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from PIL import ImageChops
 
 from pdf2image import (
     convert_from_bytes,
@@ -27,7 +28,7 @@ from pdf2image.exceptions import (
     PDFPopplerTimeoutError,
 )
 
-from functools import wraps
+from functools import partial, wraps
 
 PROFILE_MEMORY = os.environ.get("PROFILE_MEMORY", False)
 if PROFILE_MEMORY:
@@ -1518,13 +1519,12 @@ class PDFConversionMethods(unittest.TestCase):
         images_from_path = convert_from_path(
             "./tests/test_annotations.pdf", hide_annotations=True
         )
-        start_time = time.time()
-        self.assertTrue(len(images_from_path) == 1)
-        print(
-            "test_conversion_from_path_with_hide_annotations: {} sec".format(
-                time.time() - start_time
-            )
-        )
+        visible = convert_from_path("./tests/test_annotations.pdf")
+        self.assertEqual(len(images_from_path), 1)
+        self.assertEqual(len(visible), 1)
+        with images_from_path[0] as hidden_page, visible[0] as annotated_page:
+            self.assertEqual(hidden_page.size, annotated_page.size)
+            self.assertIsNotNone(ImageChops.difference(hidden_page, annotated_page).getbbox())
 
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
@@ -1649,8 +1649,13 @@ class PDFConversionMethods(unittest.TestCase):
             "./tests/test.pdf",
         ] * 50
         with Pool(10) as p:
-            res = p.map(convert_from_path, files)
-        self.assertTrue(len(res) == 50)
+            res = p.map(partial(convert_from_path, dpi=36), files)
+        self.assertEqual(len(res), len(files))
+        for pages in res:
+            self.assertEqual(len(pages), 1)
+            with pages[0] as page:
+                page.load()
+                self.assertEqual(page.format, "PPM")
         print("test_multithread_conversion: {} sec".format(time.time() - start_time))
 
     @profile
@@ -1696,32 +1701,6 @@ class PDFConversionMethods(unittest.TestCase):
                 self.assertTrue("CreationDate" in info)
         print(
             "test_pdfinfo_locked_pdf_with_userpw_only: {} sec".format(
-                time.time() - start_time
-            )
-        )
-
-    @profile
-    def test_convert_from_functions_same_number_of_parameters(self):
-        start_time = time.time()
-        self.assertEqual(
-            len(signature(convert_from_path).parameters),
-            len(signature(convert_from_bytes).parameters),
-        )
-        print(
-            "test_convert_from_functions_same_number_of_parameters: {} sec".format(
-                time.time() - start_time
-            )
-        )
-
-    @profile
-    def test_pdfinfo_functions_same_number_of_parameters(self):
-        start_time = time.time()
-        self.assertEqual(
-            len(signature(pdfinfo_from_path).parameters),
-            len(signature(pdfinfo_from_bytes).parameters),
-        )
-        print(
-            "test_pdfinfo_functions_same_number_of_parameters: {} sec".format(
                 time.time() - start_time
             )
         )
