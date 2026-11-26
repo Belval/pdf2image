@@ -218,6 +218,13 @@ def convert_from_path(
                     )
                 args = [_get_command_path("pdftocairo", poppler_path)] + args
             else:
+                # Match the requested width and height in the displayed orientation.
+                if (
+                    isinstance(size, tuple)
+                    and len(size) == 2
+                    and (poppler_version_major, poppler_version_minor) >= (0, 84)
+                ):
+                    args.append("-scale-dimension-before-rotation")
                 args = [_get_command_path("pdftoppm", poppler_path)] + args
 
             # Update page values

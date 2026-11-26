@@ -1467,6 +1467,16 @@ class PDFConversionMethods(unittest.TestCase):
             )
         )
 
+    @unittest.skipUnless(POPPLER_INSTALLED, "Poppler is not installed!")
+    def test_size_on_rotated_page(self):
+        help_text = subprocess.check_output(["pdftoppm", "-h"], stderr=subprocess.STDOUT)
+        if b"-scale-dimension-before-rotation" not in help_text:
+            self.skipTest("pdftoppm does not support scaling before rotation")
+        image, = convert_from_path("./tests/test_rotated.pdf", size=(100, 240))
+        self.assertEqual(image.size, (100, 240))
+        self.assertEqual(image.getpixel((25, 60)), (255, 0, 0))
+        self.assertEqual(image.getpixel((75, 180)), (0, 0, 255))
+
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_with_invalid_size(self):
