@@ -1,0 +1,53 @@
+name: Tests
+
+on:
+  push:
+    branches: [ 'master' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+
+      - name: Install Poppler and Python dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y poppler-utils
+          python -m pip install --upgrade pip
+          python -m pip install . coverage
+
+      # GitHub Actions sets CI=true, which skips the slow 241-page tests
+      - name: Test with Poppler
+        run: python -m coverage run tests.py
+
+      - name: Test without Poppler
+        run: |
+          sudo apt-get remove -y poppler-utils
+          python -m coverage run -a tests.py
+
+      - name: Generate coverage report
+        run: python -m coverage xml
+
+      - name: Upload coverage to Codecov
+        if: matrix.python-version == '3.14'
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false

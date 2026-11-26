@@ -179,8 +179,8 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     def test_conversion_from_bytes_241(self):  # pragma: no cover
         start_time = time.time()
@@ -196,8 +196,8 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     def test_conversion_from_path_241(self):  # pragma: no cover
         start_time = time.time()
@@ -212,8 +212,8 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     def test_conversion_from_bytes_using_dir_241(self):  # pragma: no cover
         start_time = time.time()
@@ -233,8 +233,8 @@ class PDFConversionMethods(unittest.TestCase):
     @profile
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     def test_conversion_from_path_using_dir_241(self):  # pragma: no cover
         start_time = time.time()
@@ -786,8 +786,8 @@ class PDFConversionMethods(unittest.TestCase):
 
     @profile
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_241_with_4_threads(self):  # pragma: no cover
@@ -803,8 +803,8 @@ class PDFConversionMethods(unittest.TestCase):
 
     @profile
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_241_with_4_threads(self):  # pragma: no cover
@@ -819,8 +819,8 @@ class PDFConversionMethods(unittest.TestCase):
 
     @profile
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_bytes_using_dir_241_with_4_threads(
@@ -842,8 +842,8 @@ class PDFConversionMethods(unittest.TestCase):
 
     @profile
     @unittest.skipIf(
-        "CIRCLECI" in os.environ and os.environ["CIRCLECI"] == "true",
-        "Skipping this test on CircleCI.",
+        os.environ.get("CI") == "true",
+        "Skipping this test on CI.",
     )
     @unittest.skipIf(not POPPLER_INSTALLED, "Poppler is not installed!")
     def test_conversion_from_path_using_dir_241_with_4_threads(
