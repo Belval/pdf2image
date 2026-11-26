@@ -49,6 +49,29 @@ jobs:
           name: Upload report
           command: codecov
 
+  python-compatibility:
+    parameters:
+      python-version:
+        type: string
+    docker:
+      - image: cimg/python:<< parameters.python-version >>
+    steps:
+      - checkout
+      - run:
+          name: Install Poppler and Python dependencies
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y poppler-utils
+            python -m pip install . coverage
+      - run:
+          name: Test with Poppler
+          command: CIRCLECI=true python -m coverage run tests.py
+      - run:
+          name: Test without Poppler
+          command: |
+            sudo apt-get remove -y poppler-utils
+            CIRCLECI=true python -m coverage run -a tests.py
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -56,3 +79,7 @@ workflows:
     # Inside the workflow, you define the jobs you want to run.
     jobs:
       - build-and-test
+      - python-compatibility:
+          matrix:
+            parameters:
+              python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
