@@ -118,6 +118,10 @@ def convert_from_path(
     if isinstance(pdf_path, PurePath):
         pdf_path = pdf_path.as_posix()
 
+    # A leading hyphen would be interpreted as a Poppler option.
+    if pdf_path.startswith("-"):
+        pdf_path = os.path.join(os.curdir, pdf_path)
+
     if isinstance(output_folder, PurePath):
         output_folder = output_folder.as_posix()
 
@@ -557,6 +561,9 @@ def pdfinfo_from_path(
     :rtype: Dict
     """
     try:
+        # Keep relative filenames such as "-v" from becoming Poppler options.
+        if str(pdf_path).startswith("-"):
+            pdf_path = os.path.join(os.curdir, pdf_path)
         command = [_get_command_path("pdfinfo", poppler_path), pdf_path]
 
         if userpw is not None:
