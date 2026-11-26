@@ -101,4 +101,4 @@ Here are the definitions:
 ## Limitations / known issues
 
 - A relatively big PDF will use up all your memory and cause the process to be killed (unless you use an output folder)
-- Sometimes fail read pdf signed using DocuSign, [Solution for DocuSign issue.](docs/installation.md)
+- Sometimes fail read pdf signed using DocuSign, [Solution for DocuSign issue.](docs/known_issues.md)
